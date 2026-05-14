@@ -37,9 +37,11 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-secondary to-background flex flex-col items-center p-4 overflow-y-auto">
-      <img src={introImg} alt="ISIS One Two Three" className="w-full max-w-sm mb-4" />
-      <form onSubmit={submit} className="w-full max-w-md bg-card border border-border rounded-2xl p-6 space-y-4 shadow-2xl">
+    <div
+      className="min-h-screen flex flex-col items-center justify-end p-4 overflow-y-auto bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${introImg})` }}
+    >
+      <form onSubmit={submit} className="w-full max-w-md bg-card/95 backdrop-blur border border-border rounded-2xl p-6 space-y-4 shadow-2xl mt-4 mb-4">
         <h2 className="text-2xl text-center text-gradient-primary">Démarrage Animateur</h2>
         <p className="text-center text-sm text-muted-foreground -mt-2">Renseignez vos informations pour commencer la journée</p>
 
