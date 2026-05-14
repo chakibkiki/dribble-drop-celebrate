@@ -40,14 +40,12 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
 
   return (
     <div className="relative h-screen w-full bg-[#0a2a6e] overflow-hidden">
-      {/* Bandeau haut : joueurs + titre */}
-      <div className="absolute top-0 left-0 right-0 h-[60vh] overflow-hidden pointer-events-none">
-        <img src={introImg} alt="" className="absolute top-0 left-0 w-full h-auto" />
-      </div>
-      {/* Bandeau bas : produits */}
-      <div className="absolute bottom-0 left-0 right-0 h-[45vh] overflow-hidden pointer-events-none">
-        <img src={introImg} alt="" className="absolute bottom-0 left-0 w-full h-auto" />
-      </div>
+      {/* Background unique */}
+      <img
+        src={introImg}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
+      />
 
       {/* Formulaire positionné au milieu haut, laisse les produits visibles en bas */}
       <div className="relative h-screen flex items-start justify-center px-6 pt-[44vh] z-10">
