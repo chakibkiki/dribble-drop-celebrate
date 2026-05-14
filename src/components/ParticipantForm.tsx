@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import introImg from "@/assets/intro.png";
 
 const schema = z.object({
   full_name: z.string().trim().min(2, "Nom requis").max(100),
@@ -33,26 +34,60 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
     onReady(data.id);
   };
 
+  const pill = "w-full px-6 py-3 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-secondary to-background flex items-center justify-center p-4">
-      <form onSubmit={submit} className="w-full max-w-md bg-card border border-border rounded-2xl p-6 space-y-4 shadow-2xl">
-        <h2 className="text-2xl text-center text-gradient-primary">Informations du participant</h2>
-        <div>
-          <label className="text-sm font-semibold">Nom et prénom *</label>
-          <input className="w-full mt-1 px-3 py-2 rounded-lg bg-input border border-border text-foreground" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} maxLength={100} />
-        </div>
-        <div>
-          <label className="text-sm font-semibold">Âge *</label>
-          <input type="number" inputMode="numeric" className="w-full mt-1 px-3 py-2 rounded-lg bg-input border border-border text-foreground" value={form.age} onChange={(e) => setForm({ ...form, age: e.target.value })} min={5} max={120} />
-        </div>
-        <div>
-          <label className="text-sm font-semibold">Téléphone (optionnel)</label>
-          <input type="tel" inputMode="tel" className="w-full mt-1 px-3 py-2 rounded-lg bg-input border border-border text-foreground" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} maxLength={30} />
-        </div>
-        {err && <p className="text-sm text-destructive">{err}</p>}
-        <div className="flex gap-2">
-          <button type="button" onClick={onBack} className="flex-1 py-3 rounded-xl bg-muted text-foreground font-bold">Retour</button>
-          <button type="submit" disabled={loading} className="flex-1 py-3 rounded-xl bg-gradient-gold text-accent-foreground font-bold uppercase glow-gold disabled:opacity-50">
+    <div
+      className="min-h-screen w-full bg-cover bg-top bg-no-repeat overflow-y-auto"
+      style={{ backgroundImage: `url(${introImg})` }}
+    >
+      <div className="h-[55vh] min-h-[380px]" />
+
+      <form onSubmit={submit} className="w-full max-w-md mx-auto px-6 pb-8 space-y-3">
+        <input
+          className={pill}
+          placeholder="Nom et prénom"
+          value={form.full_name}
+          onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+          maxLength={100}
+        />
+        <input
+          type="number"
+          inputMode="numeric"
+          className={pill}
+          placeholder="Âge"
+          value={form.age}
+          onChange={(e) => setForm({ ...form, age: e.target.value })}
+          min={5}
+          max={120}
+        />
+        <input
+          type="tel"
+          inputMode="tel"
+          className={pill}
+          placeholder="Téléphone (optionnel)"
+          value={form.phone}
+          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          maxLength={30}
+        />
+
+        {err && (
+          <p className="text-sm text-white bg-destructive/90 rounded-lg px-3 py-2 text-center font-semibold">{err}</p>
+        )}
+
+        <div className="flex gap-2 pt-1">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex-1 py-3 rounded-full bg-white/20 text-white border-2 border-white/70 backdrop-blur font-bold uppercase shadow-[0_3px_0_rgba(0,0,0,0.2)]"
+          >
+            Retour
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex-[2] py-3 rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider glow-gold disabled:opacity-50 shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white"
+          >
             {loading ? "..." : "Jouer ⚽"}
           </button>
         </div>
