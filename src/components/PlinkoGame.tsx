@@ -3,6 +3,7 @@ import Matter from "matter-js";
 import { SLOT_LABELS } from "@/lib/giftAlgorithm";
 import ballImg from "@/assets/ball.png";
 import fafLogo from "@/assets/faf-logo.png";
+import isisLogo from "@/assets/isis-logo.png";
 
 /**
  * Jeu Plinko sur fond terrain de foot vertical avec 5 cases.
@@ -147,13 +148,14 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
     <div className="min-h-screen bg-primary flex flex-col items-center p-3 overflow-hidden">
       <div className="w-full max-w-md flex justify-between items-center mb-2">
         <button onClick={onBack} className="text-primary-foreground/80 text-sm">← Retour</button>
-        <h2 className="text-xl text-primary-foreground tracking-wide">⚽ ISIS GOAL</h2>
+        <img src={isisLogo} alt="ISIS" className="h-8 object-contain" />
         <span className="w-12" />
       </div>
 
       <div className="relative bg-gradient-to-b from-green-700 to-green-900 rounded-xl border-4 border-primary-foreground/20 overflow-hidden" style={{ width: 420, maxWidth: "100%" }}>
         {/* Lignes terrain */}
         <div className="absolute inset-0 pointer-events-none">
+          <img src={isisLogo} alt="ISIS" className="absolute top-3 left-1/2 -translate-x-1/2 h-10 object-contain z-10" />
           <div className="absolute top-1/2 left-0 right-0 border-t-2 border-white/40" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-2 border-white/40 flex items-center justify-center">
             <img src={fafLogo} alt="FAF" className="w-20 h-20 object-contain opacity-80" />
