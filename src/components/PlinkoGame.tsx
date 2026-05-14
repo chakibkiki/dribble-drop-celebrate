@@ -118,20 +118,28 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
       Matter.Body.applyForce(ball, ball.position, { x: force, y: 0 });
     }, 30);
 
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      clearInterval(guide);
+      clearInterval(settle);
+      clearTimeout(safety);
+      setDone(true);
+      onSettled();
+    };
+
     const settle = setInterval(() => {
       const v = ball.velocity;
       const speed = Math.sqrt(v.x * v.x + v.y * v.y);
       if (ball.position.y > H - 80 && speed < 1) {
         clearInterval(settle);
         clearInterval(guide);
-        setTimeout(() => {
-          setDone(true);
-          onSettled();
-        }, 400);
+        setTimeout(finish, 400);
       }
     }, 100);
 
-    setTimeout(() => { clearInterval(guide); clearInterval(settle); if (!done) { setDone(true); onSettled(); } }, 12000);
+    const safety = setTimeout(finish, 12000);
   };
 
   return (
