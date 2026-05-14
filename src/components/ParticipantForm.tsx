@@ -37,17 +37,21 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
   const pill = "w-full px-4 py-2.5 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold text-sm shadow-[0_3px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
 
   return (
-    <div
-      className="min-h-screen w-full bg-cover bg-top bg-no-repeat flex flex-col"
-      style={{ backgroundImage: `url(${introImg})` }}
-    >
-      {/* Fond visible en haut */}
-      <div className="flex-1" />
+    <div className="relative min-h-screen w-full bg-[#0a2a6e] overflow-hidden">
+      {/* Bandeau haut : joueurs + titre */}
+      <div className="absolute top-0 left-0 right-0 h-[60vh] overflow-hidden pointer-events-none">
+        <img src={introImg} alt="" className="absolute top-0 left-0 w-full h-auto" />
+      </div>
+      {/* Bandeau bas : produits */}
+      <div className="absolute bottom-0 left-0 right-0 h-[45vh] overflow-hidden pointer-events-none">
+        <img src={introImg} alt="" className="absolute bottom-0 left-0 w-full h-auto" />
+      </div>
 
-      {/* Barre formulaire compacte ancrée en bas */}
+      {/* Formulaire transparent positionné au milieu */}
+      <div className="relative min-h-screen flex items-start justify-center px-6 pt-[42vh] pb-[40vh] z-10">
       <form
         onSubmit={submit}
-        className="w-full max-w-2xl mx-auto px-4 pb-4 pt-3 space-y-2.5 bg-gradient-to-t from-black/45 via-black/25 to-transparent backdrop-blur-[2px]"
+        className="w-full max-w-sm space-y-2 bg-transparent"
       >
         <div className="grid grid-cols-2 gap-2.5">
           <input
@@ -99,6 +103,7 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 }
