@@ -40,10 +40,10 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
 
   return (
     <div className="min-h-screen w-full bg-[#0a2a6e] overflow-y-auto flex flex-col items-center">
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full">
         <img src={introImg} alt="" className="w-full h-auto block select-none pointer-events-none" />
 
-        <form onSubmit={submit} className="absolute left-0 right-0 bottom-[18%] px-6 space-y-3">
+        <form onSubmit={submit} className="absolute left-1/2 -translate-x-1/2 w-full max-w-md bottom-[18%] px-6 space-y-3">
         <input
           className={pill}
           placeholder="Nom de l'Animateur"
