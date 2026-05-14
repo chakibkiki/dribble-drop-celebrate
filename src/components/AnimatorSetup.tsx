@@ -48,7 +48,7 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
       />
 
       {/* Formulaire centré */}
-      <div className="relative h-screen flex items-start justify-center px-6 z-10 pt-[30px]">
+      <div className="relative h-screen flex items-center justify-center px-6 z-10">
         <form onSubmit={submit} className="w-full max-w-[280px] grid grid-cols-3 gap-1.5 bg-transparent mx-[20px]">
           <input
             className={`${pill} col-span-1`}
