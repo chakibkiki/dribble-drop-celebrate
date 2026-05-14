@@ -9,7 +9,15 @@ const schema = z.object({
   phone: z.string().trim().max(30).optional().or(z.literal("")),
 });
 
-export default function ParticipantForm({ sessionId, onReady, onBack }: { sessionId: string; onReady: (participantId: string) => void; onBack: () => void }) {
+export default function ParticipantForm({
+  sessionId,
+  onReady,
+  onBack,
+}: {
+  sessionId: string;
+  onReady: (participantId: string) => void;
+  onBack: () => void;
+}) {
   const [form, setForm] = useState({ full_name: "", age: "", phone: "" });
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -23,18 +31,26 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
       return;
     }
     setLoading(true);
-    const { data, error } = await supabase.from("participants").insert({
-      session_id: sessionId,
-      full_name: parsed.data.full_name,
-      age: parsed.data.age,
-      phone: parsed.data.phone || null,
-    }).select("id").single();
+    const { data, error } = await supabase
+      .from("participants")
+      .insert({
+        session_id: sessionId,
+        full_name: parsed.data.full_name,
+        age: parsed.data.age,
+        phone: parsed.data.phone || null,
+      })
+      .select("id")
+      .single();
     setLoading(false);
-    if (error || !data) { setErr("Erreur d'enregistrement"); return; }
+    if (error || !data) {
+      setErr("Erreur d'enregistrement");
+      return;
+    }
     onReady(data.id);
   };
 
-  const pill = "w-full px-4 py-2.5 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold text-sm shadow-[0_3px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
+  const pill =
+    "w-full px-4 py-2.5 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold text-sm shadow-[0_3px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
 
   return (
     <div className="relative h-screen w-full bg-[#0a2a6e] overflow-hidden">
@@ -42,15 +58,12 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
       <img
         src={introImg}
         alt=""
-        className="absolute inset-0 w-full h-full object-contain object-center pointer-events-none select-none"
+        className="absolute inset-0 w-full h-full object-fill object-center pointer-events-none select-none"
       />
 
       {/* Formulaire centré */}
       <div className="relative h-screen flex items-center justify-center px-6 z-10">
-        <form
-          onSubmit={submit}
-          className="w-full max-w-sm grid grid-cols-3 gap-2.5 bg-transparent"
-        >
+        <form onSubmit={submit} className="w-full max-w-sm grid grid-cols-3 gap-2.5 bg-transparent">
           <input
             className={`${pill} col-span-3`}
             placeholder="Nom et prénom"
@@ -79,7 +92,9 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
           />
 
           {err && (
-            <p className="col-span-3 text-xs text-white bg-destructive/90 rounded-lg px-3 py-1.5 text-center font-semibold">{err}</p>
+            <p className="col-span-3 text-xs text-white bg-destructive/90 rounded-lg px-3 py-1.5 text-center font-semibold">
+              {err}
+            </p>
           )}
 
           <div className="col-span-3 flex gap-2">
