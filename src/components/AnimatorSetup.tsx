@@ -39,19 +39,19 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
   const pill = "w-full px-6 py-3 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
 
   return (
-    <div className="min-h-screen w-full bg-[#0a2a6e] overflow-hidden relative flex flex-col items-center justify-center">
-      {/* Bandeau haut: logo + joueurs + titre */}
-      <div
-        className="absolute top-0 left-0 right-0 h-[50vh] bg-no-repeat bg-top pointer-events-none"
-        style={{ backgroundImage: `url(${introImg})`, backgroundSize: "100% auto" }}
-      />
-      {/* Bandeau bas: produits + pelouse */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-[28vh] bg-no-repeat bg-bottom pointer-events-none"
-        style={{ backgroundImage: `url(${introImg})`, backgroundSize: "100% auto" }}
-      />
+    <div className="min-h-screen w-full bg-[#0a2a6e] flex flex-col">
+      {/* Bandeau haut : joueurs + titre */}
+      <div className="relative w-full h-[55vh] min-h-[360px] overflow-hidden flex-shrink-0">
+        <img
+          src={introImg}
+          alt=""
+          className="absolute top-0 left-0 w-full h-auto select-none pointer-events-none"
+        />
+      </div>
 
-      <form onSubmit={submit} className="relative z-10 w-full max-w-md px-6 space-y-3 my-auto">
+      {/* Formulaire au centre */}
+      <div className="flex-1 flex items-center justify-center px-6 py-4">
+        <form onSubmit={submit} className="w-full max-w-md space-y-2">
         <input
           className={pill}
           placeholder="Nom de l'Animateur"
@@ -106,6 +106,16 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
           {loading ? "..." : "Démarrer la journée"}
         </button>
       </form>
+      </div>
+
+      {/* Bandeau bas : produits */}
+      <div className="relative w-full h-[22vh] min-h-[150px] overflow-hidden flex-shrink-0">
+        <img
+          src={introImg}
+          alt=""
+          className="absolute bottom-0 left-0 w-full h-auto select-none pointer-events-none"
+        />
+      </div>
     </div>
   );
 }
