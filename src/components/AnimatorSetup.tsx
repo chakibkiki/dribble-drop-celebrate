@@ -44,11 +44,11 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
       <img
         src={introImg}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
+        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none scale-110"
       />
 
-      {/* Formulaire positionné au milieu haut, laisse les produits visibles en bas */}
-      <div className="relative h-screen flex items-start justify-center px-6 pt-[44vh] z-10">
+      {/* Formulaire centré */}
+      <div className="relative h-screen flex items-center justify-center px-6 z-10">
         <form onSubmit={submit} className="w-full max-w-[280px] space-y-1.5 bg-transparent">
         <input
           className={pill}
