@@ -34,7 +34,7 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
     onReady(data.id);
   };
 
-  const pill = "w-full px-5 py-3 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold text-base shadow-[0_3px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
+  const pill = "w-full px-4 py-2.5 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold text-sm shadow-[0_3px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
 
   return (
     <div className="relative h-screen w-full bg-[#0a2a6e] overflow-hidden">
