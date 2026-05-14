@@ -41,7 +41,7 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
       className="min-h-screen w-full bg-cover bg-top bg-no-repeat overflow-y-auto"
       style={{ backgroundImage: `url(${introImg})` }}
     >
-      <div className="h-[55vh] min-h-[380px]" />
+      <div className="h-[72vh] min-h-[520px]" />
 
       <form onSubmit={submit} className="w-full max-w-md mx-auto px-6 pb-8 space-y-3">
         <input
