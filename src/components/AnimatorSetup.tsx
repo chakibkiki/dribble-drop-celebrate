@@ -49,61 +49,61 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
 
       {/* Formulaire centré */}
       <div className="relative h-screen flex items-center justify-center px-6 z-10">
-        <form onSubmit={submit} className="w-full max-w-[280px] space-y-1.5 bg-transparent mx-[20px]">
-        <input
-          className={pill}
-          placeholder="Nom de l'Animateur"
-          value={form.animator_name}
-          onChange={(e) => setForm({ ...form, animator_name: e.target.value })}
-          maxLength={100}
-        />
-        <input
-          className={pill}
-          placeholder="La Ville"
-          value={form.wilaya}
-          onChange={(e) => setForm({ ...form, wilaya: e.target.value })}
-          maxLength={60}
-        />
-        <input
-          className={pill}
-          placeholder="Nom du Magasin"
-          value={form.store_name}
-          onChange={(e) => setForm({ ...form, store_name: e.target.value })}
-          maxLength={120}
-        />
+        <form onSubmit={submit} className="w-full max-w-[280px] grid grid-cols-3 gap-1.5 bg-transparent mx-[20px]">
+          <input
+            className={`${pill} col-span-3`}
+            placeholder="Nom de l'Animateur"
+            value={form.animator_name}
+            onChange={(e) => setForm({ ...form, animator_name: e.target.value })}
+            maxLength={100}
+          />
+          <input
+            className={`${pill} col-span-3`}
+            placeholder="La Ville"
+            value={form.wilaya}
+            onChange={(e) => setForm({ ...form, wilaya: e.target.value })}
+            maxLength={60}
+          />
+          <input
+            className={`${pill} col-span-3`}
+            placeholder="Nom du Magasin"
+            value={form.store_name}
+            onChange={(e) => setForm({ ...form, store_name: e.target.value })}
+            maxLength={120}
+          />
 
-        <div className="grid grid-cols-3 gap-1.5 pt-0.5">
-          {(["top_mt", "mt", "mm"] as StoreType[]).map((t) => (
-            <button
-              type="button"
-              key={t}
-              onClick={() => setForm({ ...form, store_type: t })}
-              className={`py-1 rounded-full border text-[10px] font-bold uppercase transition shadow-[0_2px_0_rgba(0,0,0,0.2)] ${
-                form.store_type === t
-                  ? "bg-white text-[#e63946] border-white"
-                  : "bg-white/20 text-white border-white/70 backdrop-blur"
-              }`}
-            >
-              {STORE_TYPE_LABEL[t]}
-            </button>
-          ))}
-        </div>
-        <p className="text-[10px] text-white text-center font-semibold drop-shadow">
-          {form.store_type === "mm" ? "Quota : 60 cadeaux/jour" : "Quota : 80 cadeaux/jour"}
-        </p>
+          <div className="col-span-3 grid grid-cols-3 gap-1.5 pt-0.5">
+            {(["top_mt", "mt", "mm"] as StoreType[]).map((t) => (
+              <button
+                type="button"
+                key={t}
+                onClick={() => setForm({ ...form, store_type: t })}
+                className={`py-1 rounded-full border text-[10px] font-bold uppercase transition shadow-[0_2px_0_rgba(0,0,0,0.2)] ${
+                  form.store_type === t
+                    ? "bg-white text-[#e63946] border-white"
+                    : "bg-white/20 text-white border-white/70 backdrop-blur"
+                }`}
+              >
+                {STORE_TYPE_LABEL[t]}
+              </button>
+            ))}
+          </div>
+          <p className="col-span-3 text-[10px] text-white text-center font-semibold drop-shadow">
+            {form.store_type === "mm" ? "Quota : 60 cadeaux/jour" : "Quota : 80 cadeaux/jour"}
+          </p>
 
-        {err && (
-          <p className="text-sm text-white bg-destructive/90 rounded-lg px-3 py-2 text-center font-semibold">{err}</p>
-        )}
+          {err && (
+            <p className="col-span-3 text-sm text-white bg-destructive/90 rounded-lg px-3 py-2 text-center font-semibold">{err}</p>
+          )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-1.5 text-xs rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider glow-gold disabled:opacity-50 shadow-[0_3px_0_rgba(0,0,0,0.25)] border border-white"
-        >
-          {loading ? "..." : "Démarrer la journée"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={loading}
+            className="col-span-3 w-full py-1.5 text-xs rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider glow-gold disabled:opacity-50 shadow-[0_3px_0_rgba(0,0,0,0.25)] border border-white"
+          >
+            {loading ? "..." : "Démarrer la journée"}
+          </button>
+        </form>
       </div>
     </div>
   );
