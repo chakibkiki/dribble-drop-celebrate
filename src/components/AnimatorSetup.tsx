@@ -101,7 +101,6 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
           {loading ? "..." : "Démarrer la journée"}
         </button>
       </form>
-      </div>
     </div>
   );
 }
