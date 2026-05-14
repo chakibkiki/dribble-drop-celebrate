@@ -37,18 +37,14 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
   const pill = "w-full px-4 py-2.5 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold text-sm shadow-[0_3px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
 
   return (
-    <div className="relative min-h-screen w-full bg-[#0a2a6e] overflow-hidden">
-      {/* Bandeau haut : joueurs + titre */}
-      <div className="absolute top-0 left-0 right-0 h-[60vh] overflow-hidden pointer-events-none">
-        <img src={introImg} alt="" className="absolute top-0 left-0 w-full h-auto" />
-      </div>
-      {/* Bandeau bas : produits */}
-      <div className="absolute bottom-0 left-0 right-0 h-[45vh] overflow-hidden pointer-events-none">
-        <img src={introImg} alt="" className="absolute bottom-0 left-0 w-full h-auto" />
+    <div className="min-h-screen w-full bg-[#0a2a6e] flex flex-col">
+      {/* Bandeau haut : joueurs + titre ONE TWO THREE ISIS */}
+      <div className="relative w-full overflow-hidden flex-shrink-0" style={{ aspectRatio: "1000 / 1000" }}>
+        <img src={introImg} alt="" className="absolute top-0 left-0 w-full h-auto pointer-events-none select-none" />
       </div>
 
-      {/* Formulaire transparent positionné au milieu */}
-      <div className="relative min-h-screen flex items-start justify-center px-6 pt-[42vh] pb-[40vh] z-10">
+      {/* Formulaire au milieu */}
+      <div className="flex-1 flex items-center justify-center px-6 py-4">
       <form
         onSubmit={submit}
         className="w-full max-w-sm space-y-2 bg-transparent"
@@ -103,6 +99,11 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
           </button>
         </div>
       </form>
+      </div>
+
+      {/* Bandeau bas : produits */}
+      <div className="relative w-full overflow-hidden flex-shrink-0" style={{ aspectRatio: "1000 / 600" }}>
+        <img src={introImg} alt="" className="absolute bottom-0 left-0 w-full h-auto pointer-events-none select-none" />
       </div>
     </div>
   );
