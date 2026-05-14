@@ -42,7 +42,7 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
       <img
         src={introImg}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
+        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none scale-110"
       />
 
       {/* Formulaire transparent au milieu */}
