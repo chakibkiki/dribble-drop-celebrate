@@ -49,11 +49,10 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
       <div className="relative h-screen flex items-center justify-center px-6 z-10">
         <form
           onSubmit={submit}
-          className="w-full max-w-sm space-y-2 bg-transparent"
+          className="w-full max-w-sm grid grid-cols-3 gap-2.5 bg-transparent"
         >
-        <div className="grid grid-cols-2 gap-2.5">
           <input
-            className={`${pill} col-span-2`}
+            className={`${pill} col-span-3`}
             placeholder="Nom et prénom"
             value={form.full_name}
             onChange={(e) => setForm({ ...form, full_name: e.target.value })}
@@ -62,7 +61,7 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
           <input
             type="number"
             inputMode="numeric"
-            className={pill}
+            className={`${pill} col-span-1`}
             placeholder="Âge"
             value={form.age}
             onChange={(e) => setForm({ ...form, age: e.target.value })}
@@ -72,35 +71,34 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
           <input
             type="tel"
             inputMode="tel"
-            className={pill}
+            className={`${pill} col-span-2`}
             placeholder="Téléphone (optionnel)"
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
             maxLength={30}
           />
-        </div>
 
-        {err && (
-          <p className="text-xs text-white bg-destructive/90 rounded-lg px-3 py-1.5 text-center font-semibold">{err}</p>
-        )}
+          {err && (
+            <p className="col-span-3 text-xs text-white bg-destructive/90 rounded-lg px-3 py-1.5 text-center font-semibold">{err}</p>
+          )}
 
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex-1 py-2.5 rounded-full bg-white/25 text-white border-2 border-white/70 backdrop-blur font-bold uppercase text-sm shadow-[0_3px_0_rgba(0,0,0,0.2)]"
-          >
-            Retour
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-[2] py-2.5 rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider text-sm glow-gold disabled:opacity-50 shadow-[0_3px_0_rgba(0,0,0,0.25)] border-2 border-white"
-          >
-            {loading ? "..." : "Jouer ⚽"}
-          </button>
-        </div>
-      </form>
+          <div className="col-span-3 flex gap-2">
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex-1 py-2.5 rounded-full bg-white/25 text-white border-2 border-white/70 backdrop-blur font-bold uppercase text-sm shadow-[0_3px_0_rgba(0,0,0,0.2)]"
+            >
+              Retour
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-[2] py-2.5 rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider text-sm glow-gold disabled:opacity-50 shadow-[0_3px_0_rgba(0,0,0,0.25)] border-2 border-white"
+            >
+              {loading ? "..." : "Jouer ⚽"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
