@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Matter from "matter-js";
 import { SLOT_LABELS } from "@/lib/giftAlgorithm";
+import ballImg from "@/assets/ball.png";
 
 /**
  * Jeu Plinko sur fond terrain de foot vertical avec 5 cases.
@@ -93,11 +94,18 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
     const slotW = W / 5;
     const targetX = slotW * targetSlot + slotW / 2;
 
-    const ball = Matter.Bodies.circle(W / 2 + (Math.random() - 0.5) * 30, 30, 14, {
+    const ballRadius = 18;
+    const ball = Matter.Bodies.circle(W / 2 + (Math.random() - 0.5) * 30, 30, ballRadius, {
       restitution: 0.35,
       friction: 0.05,
       density: 0.003,
-      render: { fillStyle: "#ffffff", strokeStyle: "#000", lineWidth: 2 },
+      render: {
+        sprite: {
+          texture: ballImg,
+          xScale: (ballRadius * 2) / 256,
+          yScale: (ballRadius * 2) / 256,
+        },
+      },
     });
     Matter.Composite.add(engineRef.current.world, ball);
 
