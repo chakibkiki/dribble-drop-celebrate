@@ -36,7 +36,7 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
     onReady(data.id);
   };
 
-  const pill = "w-full px-4 py-2 text-sm rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
+  const pill = "w-full px-3 py-1.5 text-xs rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_3px_0_rgba(0,0,0,0.25)] border border-white focus:outline-none focus:ring-2 focus:ring-white/40";
 
   return (
     <div className="relative h-screen w-full bg-[#0a2a6e] overflow-hidden">
@@ -50,8 +50,8 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
       </div>
 
       {/* Formulaire positionné au milieu haut, laisse les produits visibles en bas */}
-      <div className="relative h-screen flex items-start justify-center px-6 pt-[42vh] z-10">
-        <form onSubmit={submit} className="w-full max-w-sm space-y-2 bg-transparent">
+      <div className="relative h-screen flex items-start justify-center px-6 pt-[44vh] z-10">
+        <form onSubmit={submit} className="w-full max-w-[280px] space-y-1.5 bg-transparent">
         <input
           className={pill}
           placeholder="Nom de l'Animateur"
@@ -74,13 +74,13 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
           maxLength={120}
         />
 
-        <div className="grid grid-cols-3 gap-2 pt-1">
+        <div className="grid grid-cols-3 gap-1.5 pt-0.5">
           {(["top_mt", "mt", "mm"] as StoreType[]).map((t) => (
             <button
               type="button"
               key={t}
               onClick={() => setForm({ ...form, store_type: t })}
-              className={`py-2 rounded-full border-2 text-sm font-bold uppercase transition shadow-[0_3px_0_rgba(0,0,0,0.2)] ${
+              className={`py-1 rounded-full border text-[10px] font-bold uppercase transition shadow-[0_2px_0_rgba(0,0,0,0.2)] ${
                 form.store_type === t
                   ? "bg-white text-[#e63946] border-white"
                   : "bg-white/20 text-white border-white/70 backdrop-blur"
@@ -90,7 +90,7 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
             </button>
           ))}
         </div>
-        <p className="text-xs text-white text-center font-semibold drop-shadow">
+        <p className="text-[10px] text-white text-center font-semibold drop-shadow">
           {form.store_type === "mm" ? "Quota : 60 cadeaux/jour" : "Quota : 80 cadeaux/jour"}
         </p>
 
@@ -101,7 +101,7 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 text-sm rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider glow-gold disabled:opacity-50 shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white"
+          className="w-full py-1.5 text-xs rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider glow-gold disabled:opacity-50 shadow-[0_3px_0_rgba(0,0,0,0.25)] border border-white"
         >
           {loading ? "..." : "Démarrer la journée"}
         </button>
