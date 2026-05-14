@@ -44,7 +44,7 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
       <img
         src={introImg}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none scale-100"
+        className="absolute inset-0 w-full h-full object-contain object-center pointer-events-none select-none"
       />
 
       {/* Formulaire centré */}
