@@ -42,7 +42,7 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
       <img
         src={introImg}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover object-top pointer-events-none select-none scale-90"
+        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none scale-[0.7]"
       />
 
       {/* Formulaire centré */}
