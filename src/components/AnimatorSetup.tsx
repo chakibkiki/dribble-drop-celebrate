@@ -39,14 +39,11 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
   const pill = "w-full px-6 py-3 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
 
   return (
-    <div
-      className="min-h-screen w-full bg-cover bg-top bg-no-repeat overflow-y-auto"
-      style={{ backgroundImage: `url(${introImg})` }}
-    >
-      {/* Spacer to let the visual breathe at top (logo + players + title) */}
-      <div className="h-[55vh] min-h-[380px]" />
+    <div className="min-h-screen w-full bg-[#0a2a6e] overflow-y-auto flex flex-col items-center">
+      <div className="relative w-full max-w-md">
+        <img src={introImg} alt="" className="w-full h-auto block select-none pointer-events-none" />
 
-      <form onSubmit={submit} className="w-full max-w-md mx-auto px-6 pb-8 space-y-3">
+        <form onSubmit={submit} className="absolute left-0 right-0 bottom-[18%] px-6 space-y-3">
         <input
           className={pill}
           placeholder="Nom de l'Animateur"
@@ -101,6 +98,7 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
           {loading ? "..." : "Démarrer la journée"}
         </button>
       </form>
+      </div>
     </div>
   );
 }
