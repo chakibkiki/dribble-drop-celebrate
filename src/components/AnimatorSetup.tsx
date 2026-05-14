@@ -49,8 +49,8 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
         <img src={introImg} alt="" className="absolute bottom-0 left-0 w-full h-auto" />
       </div>
 
-      {/* Formulaire au centre, transparent */}
-      <div className="relative min-h-screen flex items-center justify-center px-6 py-4 z-10">
+      {/* Formulaire positionné au milieu haut, laisse les produits visibles en bas */}
+      <div className="relative min-h-screen flex items-start justify-center px-6 pt-[42vh] pb-[40vh] z-10">
         <form onSubmit={submit} className="w-full max-w-sm space-y-2 bg-transparent">
         <input
           className={pill}
