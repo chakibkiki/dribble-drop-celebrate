@@ -34,59 +34,66 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
     onReady(data.id);
   };
 
-  const pill = "w-full px-6 py-3 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
+  const pill = "w-full px-4 py-2.5 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold text-sm shadow-[0_3px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
 
   return (
     <div
-      className="min-h-screen w-full bg-cover bg-top bg-no-repeat overflow-y-auto"
+      className="min-h-screen w-full bg-cover bg-top bg-no-repeat flex flex-col"
       style={{ backgroundImage: `url(${introImg})` }}
     >
-      <div className="h-[72vh] min-h-[520px]" />
+      {/* Fond visible en haut */}
+      <div className="flex-1" />
 
-      <form onSubmit={submit} className="w-full max-w-md mx-auto px-6 pb-8 space-y-3">
-        <input
-          className={pill}
-          placeholder="Nom et prénom"
-          value={form.full_name}
-          onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-          maxLength={100}
-        />
-        <input
-          type="number"
-          inputMode="numeric"
-          className={pill}
-          placeholder="Âge"
-          value={form.age}
-          onChange={(e) => setForm({ ...form, age: e.target.value })}
-          min={5}
-          max={120}
-        />
-        <input
-          type="tel"
-          inputMode="tel"
-          className={pill}
-          placeholder="Téléphone (optionnel)"
-          value={form.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          maxLength={30}
-        />
+      {/* Barre formulaire compacte ancrée en bas */}
+      <form
+        onSubmit={submit}
+        className="w-full max-w-2xl mx-auto px-4 pb-4 pt-3 space-y-2.5 bg-gradient-to-t from-black/45 via-black/25 to-transparent backdrop-blur-[2px]"
+      >
+        <div className="grid grid-cols-2 gap-2.5">
+          <input
+            className={`${pill} col-span-2`}
+            placeholder="Nom et prénom"
+            value={form.full_name}
+            onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+            maxLength={100}
+          />
+          <input
+            type="number"
+            inputMode="numeric"
+            className={pill}
+            placeholder="Âge"
+            value={form.age}
+            onChange={(e) => setForm({ ...form, age: e.target.value })}
+            min={5}
+            max={120}
+          />
+          <input
+            type="tel"
+            inputMode="tel"
+            className={pill}
+            placeholder="Téléphone (optionnel)"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            maxLength={30}
+          />
+        </div>
 
         {err && (
-          <p className="text-sm text-white bg-destructive/90 rounded-lg px-3 py-2 text-center font-semibold">{err}</p>
+          <p className="text-xs text-white bg-destructive/90 rounded-lg px-3 py-1.5 text-center font-semibold">{err}</p>
         )}
 
-        <div className="flex gap-2 pt-1">
+        <div className="flex gap-2">
           <button
             type="button"
             onClick={onBack}
-            className="flex-1 py-3 rounded-full bg-white/20 text-white border-2 border-white/70 backdrop-blur font-bold uppercase shadow-[0_3px_0_rgba(0,0,0,0.2)]"
+            className="flex-1 py-2.5 rounded-full bg-white/25 text-white border-2 border-white/70 backdrop-blur font-bold uppercase text-sm shadow-[0_3px_0_rgba(0,0,0,0.2)]"
           >
             Retour
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex-[2] py-3 rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider glow-gold disabled:opacity-50 shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white"
+            className="flex-[2] py-2.5 rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider text-sm glow-gold disabled:opacity-50 shadow-[0_3px_0_rgba(0,0,0,0.25)] border-2 border-white"
           >
             {loading ? "..." : "Jouer ⚽"}
           </button>
