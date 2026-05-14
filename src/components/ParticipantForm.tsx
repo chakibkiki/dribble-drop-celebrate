@@ -62,7 +62,7 @@ export default function ParticipantForm({
       />
 
       {/* Formulaire centré */}
-      <div className="relative h-screen flex items-start justify-center px-6 z-10 pt-[55vh]">
+      <div className="relative h-screen flex items-start justify-center px-6 z-10 pt-[59vh]">
         <form onSubmit={submit} className="w-full max-w-sm grid grid-cols-3 gap-2.5 bg-transparent">
           <input
             className={`${pill} col-span-3`}
