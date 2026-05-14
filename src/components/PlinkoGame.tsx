@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Matter from "matter-js";
 import { SLOT_LABELS } from "@/lib/giftAlgorithm";
 import ballImg from "@/assets/ball.png";
+import fafLogo from "@/assets/faf-logo.png";
 
 /**
  * Jeu Plinko sur fond terrain de foot vertical avec 5 cases.
@@ -154,7 +155,9 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
         {/* Lignes terrain */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-0 right-0 border-t-2 border-white/40" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-2 border-white/40" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-2 border-white/40 flex items-center justify-center">
+            <img src={fafLogo} alt="FAF" className="w-20 h-20 object-contain opacity-80" />
+          </div>
           <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-40 h-20 border-2 border-white/40 border-b-0" />
         </div>
 
