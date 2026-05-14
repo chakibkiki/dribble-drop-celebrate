@@ -45,8 +45,8 @@ export default function ParticipantForm({ sessionId, onReady, onBack }: { sessio
         className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none scale-110"
       />
 
-      {/* Formulaire transparent au milieu */}
-      <div className="relative h-screen flex items-start justify-center px-6 pt-[42vh] z-10">
+      {/* Formulaire centré */}
+      <div className="relative h-screen flex items-center justify-center px-6 z-10">
         <form
           onSubmit={submit}
           className="w-full max-w-sm space-y-2 bg-transparent"
