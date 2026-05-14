@@ -1,247 +1,165 @@
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import Matter from "matter-js";
-import PrizeModal from "./PrizeModal";
-import GameHeader from "./GameHeader";
+import { SLOT_LABELS } from "@/lib/giftAlgorithm";
 
-const PRIZES = [
-  { label: "🧴 1 Lessive\nGratuite", color: "#e74c3c", tier: "gold" },
-  { label: "⚽ Ballon\nOfficiel", color: "#3498db", tier: "silver" },
-  { label: "🎉 -50%\nSur Tout", color: "#f1c40f", tier: "gold" },
-  { label: "😢\nRejouer", color: "#555", tier: "lose" },
-  { label: "🏆 Pack\nComplet", color: "#e74c3c", tier: "gold" },
-  { label: "🎁 -20%\nLessive", color: "#3498db", tier: "silver" },
-  { label: "⚡ Échantillon\nGratuit", color: "#2ecc71", tier: "bronze" },
-];
-
-export default function PlinkoGame() {
+/**
+ * Jeu Plinko sur fond terrain de foot vertical avec 5 cases.
+ * Le ballon est subtilement guidé vers le slot cible (déterminé en amont par l'algo).
+ */
+export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSlot: number; onSettled: () => void; onBack: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
-  const runnerRef = useRef<Matter.Runner | null>(null);
-  const renderRef = useRef<Matter.Render | null>(null);
-  const [dropping, setDropping] = useState(false);
-  const [wonPrize, setWonPrize] = useState<typeof PRIZES[0] | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [tries, setTries] = useState(3);
+  const [dropped, setDropped] = useState(false);
+  const [done, setDone] = useState(false);
 
-  const getSize = useCallback(() => {
-    const w = Math.min(window.innerWidth, 500);
-    const h = Math.min(window.innerHeight - 160, 700);
-    return { w, h };
-  }, []);
-
-  const setupGame = useCallback(() => {
+  useEffect(() => {
     if (!canvasRef.current) return;
-
-    // Cleanup previous
-    if (renderRef.current) Matter.Render.stop(renderRef.current);
-    if (runnerRef.current) Matter.Runner.stop(runnerRef.current);
-    if (engineRef.current) Matter.Engine.clear(engineRef.current);
-
-    const { w, h } = getSize();
     const canvas = canvasRef.current;
-    canvas.width = w;
-    canvas.height = h;
+
+    const W = 420;
+    const H = 720;
+    canvas.width = W;
+    canvas.height = H;
 
     const engine = Matter.Engine.create();
+    engine.gravity.y = 1;
     engineRef.current = engine;
 
     const render = Matter.Render.create({
       canvas,
       engine,
-      options: {
-        width: w,
-        height: h,
-        wireframes: false,
-        background: "transparent",
-        pixelRatio: window.devicePixelRatio || 1,
-      },
+      options: { width: W, height: H, wireframes: false, background: "transparent", pixelRatio: window.devicePixelRatio || 1 },
     });
-    renderRef.current = render;
 
-    // Walls
-    const wallOpts = { isStatic: true, render: { fillStyle: "hsl(220, 80%, 50%)" } };
+    // Murs
+    const wallStyle = { isStatic: true, render: { fillStyle: "transparent" } };
     Matter.Composite.add(engine.world, [
-      Matter.Bodies.rectangle(w / 2, h + 25, w, 50, { ...wallOpts, render: { fillStyle: "transparent" } }),
-      Matter.Bodies.rectangle(-15, h / 2, 30, h, wallOpts),
-      Matter.Bodies.rectangle(w + 15, h / 2, 30, h, wallOpts),
+      Matter.Bodies.rectangle(W / 2, H + 20, W, 40, wallStyle),
+      Matter.Bodies.rectangle(-10, H / 2, 20, H, wallStyle),
+      Matter.Bodies.rectangle(W + 10, H / 2, 20, H, wallStyle),
     ]);
 
-    // Pegs
-    const rows = 9;
-    const pegRadius = Math.max(4, w * 0.012);
-    const startY = h * 0.12;
-    const endY = h * 0.72;
-    const rowGap = (endY - startY) / rows;
-
-    for (let row = 0; row < rows; row++) {
-      const cols = row % 2 === 0 ? 8 : 7;
-      const offset = row % 2 === 0 ? 0 : rowGap * 0.55;
-      const gap = w / 8;
-      for (let col = 0; col < cols; col++) {
-        const x = gap * 0.5 + col * gap + offset;
-        const y = startY + row * rowGap;
+    // Pegs (style stade vert image)
+    const rows = 8;
+    const startY = 130;
+    const endY = H - 160;
+    const rowGap = (endY - startY) / (rows - 1);
+    const pegRadius = 7;
+    for (let r = 0; r < rows; r++) {
+      const cols = r % 2 === 0 ? 7 : 6;
+      const colGap = W / 7;
+      const offset = r % 2 === 0 ? colGap / 2 : colGap;
+      for (let c = 0; c < cols; c++) {
         Matter.Composite.add(
           engine.world,
-          Matter.Bodies.circle(x, y, pegRadius, {
+          Matter.Bodies.circle(offset + c * colGap, startY + r * rowGap, pegRadius, {
             isStatic: true,
-            render: {
-              fillStyle: row % 2 === 0 ? "hsl(0, 78%, 55%)" : "hsl(220, 80%, 50%)",
-            },
-            restitution: 0.5,
+            render: { fillStyle: "#ffffff" },
+            restitution: 0.4,
           })
         );
       }
     }
 
-    // Prize slot dividers
-    const slotWidth = w / PRIZES.length;
-    const slotY = h * 0.82;
-    const slotHeight = h * 0.18;
-    const dividerWidth = 3;
-
-    for (let i = 0; i <= PRIZES.length; i++) {
-      const x = i * slotWidth;
+    // 5 séparateurs slots
+    const slotsCount = 5;
+    const slotW = W / slotsCount;
+    const slotTop = H - 110;
+    for (let i = 0; i <= slotsCount; i++) {
       Matter.Composite.add(
         engine.world,
-        Matter.Bodies.rectangle(x, slotY + slotHeight / 2, dividerWidth, slotHeight, {
+        Matter.Bodies.rectangle(i * slotW, slotTop + 55, 4, 110, {
           isStatic: true,
-          render: { fillStyle: "hsl(220, 80%, 50%)" },
+          render: { fillStyle: "#ffffff" },
         })
       );
     }
 
-    // Custom afterRender for prize labels
-    Matter.Events.on(render, "afterRender", () => {
-      const ctx = render.context;
-      const fontSize = Math.max(8, w * 0.02);
-      ctx.font = `bold ${fontSize}px Inter, sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "top";
-
-      PRIZES.forEach((prize, i) => {
-        const x = i * slotWidth + slotWidth / 2;
-        const y = slotY + 6;
-
-        // Slot background
-        ctx.fillStyle = prize.color + "33";
-        ctx.fillRect(i * slotWidth + 2, slotY, slotWidth - 4, slotHeight);
-
-        // Label
-        ctx.fillStyle = "#fff";
-        const lines = prize.label.split("\n");
-        lines.forEach((line, li) => {
-          ctx.fillText(line, x, y + li * (fontSize + 3));
-        });
-      });
-    });
-
     Matter.Render.run(render);
     const runner = Matter.Runner.create();
-    runnerRef.current = runner;
     Matter.Runner.run(runner, engine);
-  }, [getSize]);
 
-  useEffect(() => {
-    setupGame();
-    const handleResize = () => setupGame();
-    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
-      if (renderRef.current) Matter.Render.stop(renderRef.current);
-      if (runnerRef.current) Matter.Runner.stop(runnerRef.current);
+      Matter.Render.stop(render);
+      Matter.Runner.stop(runner);
+      Matter.Engine.clear(engine);
     };
-  }, [setupGame]);
+  }, []);
 
-  const dropBall = useCallback(() => {
-    if (!engineRef.current || dropping || tries <= 0) return;
-    setDropping(true);
-    setTries((t) => t - 1);
+  const drop = () => {
+    if (!engineRef.current || dropped) return;
+    setDropped(true);
+    const W = 420, H = 720;
+    const slotW = W / 5;
+    const targetX = slotW * targetSlot + slotW / 2;
 
-    const { w, h } = getSize();
-    const slotWidth = w / PRIZES.length;
-
-    // Random starting position near center
-    const x = w / 2 + (Math.random() - 0.5) * w * 0.3;
-    const ball = Matter.Bodies.circle(x, 10, Math.max(8, w * 0.025), {
-      restitution: 0.4,
-      friction: 0.1,
-      density: 0.002,
-      render: {
-        fillStyle: "hsl(45, 100%, 55%)",
-        strokeStyle: "hsl(35, 100%, 40%)",
-        lineWidth: 2,
-      },
+    const ball = Matter.Bodies.circle(W / 2 + (Math.random() - 0.5) * 30, 30, 14, {
+      restitution: 0.35,
+      friction: 0.05,
+      density: 0.003,
+      render: { fillStyle: "#ffffff", strokeStyle: "#000", lineWidth: 2 },
     });
     Matter.Composite.add(engineRef.current.world, ball);
 
-    // Check when ball settles
-    const check = setInterval(() => {
-      const vel = ball.velocity;
-      const speed = Math.sqrt(vel.x * vel.x + vel.y * vel.y);
-      if (ball.position.y > h * 0.78 && speed < 1.5) {
-        clearInterval(check);
-        const slotIndex = Math.min(
-          PRIZES.length - 1,
-          Math.max(0, Math.floor(ball.position.x / slotWidth))
-        );
+    // Guidage subtil : applique une petite force latérale chaque tick
+    const guide = setInterval(() => {
+      if (!engineRef.current) return;
+      const dx = targetX - ball.position.x;
+      const proximity = Math.max(0, Math.min(1, (ball.position.y - 100) / (H - 200)));
+      const force = (dx / W) * 0.0006 * proximity * ball.mass;
+      Matter.Body.applyForce(ball, ball.position, { x: force, y: 0 });
+    }, 30);
+
+    const settle = setInterval(() => {
+      const v = ball.velocity;
+      const speed = Math.sqrt(v.x * v.x + v.y * v.y);
+      if (ball.position.y > H - 80 && speed < 1) {
+        clearInterval(settle);
+        clearInterval(guide);
         setTimeout(() => {
-          setWonPrize(PRIZES[slotIndex]);
-          setShowModal(true);
-          setDropping(false);
-          // Remove ball
-          Matter.Composite.remove(engineRef.current!.world, ball);
-        }, 500);
+          setDone(true);
+          onSettled();
+        }, 400);
       }
     }, 100);
 
-    // Safety timeout
-    setTimeout(() => {
-      clearInterval(check);
-      if (dropping) {
-        setDropping(false);
-        try {
-          Matter.Composite.remove(engineRef.current!.world, ball);
-        } catch {}
-      }
-    }, 10000);
-  }, [dropping, tries, getSize]);
+    setTimeout(() => { clearInterval(guide); clearInterval(settle); if (!done) { setDone(true); onSettled(); } }, 12000);
+  };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-background px-2 py-4 select-none overflow-hidden">
-      <GameHeader tries={tries} />
-
-      <div className="relative w-full max-w-[500px] flex-1 flex items-center justify-center">
-        {/* Glow behind canvas */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-primary opacity-10 blur-3xl" />
-
-        <canvas
-          ref={canvasRef}
-          className="relative z-10 rounded-2xl border border-border"
-          style={{ touchAction: "none", maxWidth: "100%", background: "hsl(220, 25%, 10%)" }}
-        />
+    <div className="min-h-screen bg-primary flex flex-col items-center p-3 overflow-hidden">
+      <div className="w-full max-w-md flex justify-between items-center mb-2">
+        <button onClick={onBack} className="text-primary-foreground/80 text-sm">← Retour</button>
+        <h2 className="text-xl text-primary-foreground tracking-wide">⚽ ISIS GOAL</h2>
+        <span className="w-12" />
       </div>
 
-      <button
-        onClick={dropBall}
-        disabled={dropping || tries <= 0}
-        className={`
-          mt-4 px-8 py-4 rounded-xl text-lg font-bold uppercase tracking-wider
-          transition-all duration-300 active:scale-95
-          ${tries <= 0
-            ? "bg-muted text-muted-foreground cursor-not-allowed"
-            : "bg-gradient-gold text-accent-foreground glow-gold hover:scale-105"
-          }
-        `}
-      >
-        {tries <= 0 ? "Plus d'essais !" : dropping ? "⚽ En cours..." : "🏆 Lancer la balle !"}
-      </button>
+      <div className="relative bg-gradient-to-b from-green-700 to-green-900 rounded-xl border-4 border-primary-foreground/20 overflow-hidden" style={{ width: 420, maxWidth: "100%" }}>
+        {/* Lignes terrain */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-0 right-0 border-t-2 border-white/40" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-2 border-white/40" />
+          <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-40 h-20 border-2 border-white/40 border-b-0" />
+        </div>
 
-      {showModal && wonPrize && (
-        <PrizeModal
-          prize={wonPrize}
-          onClose={() => setShowModal(false)}
-        />
+        <canvas ref={canvasRef} className="relative z-10" style={{ touchAction: "none", display: "block", maxWidth: "100%" }} />
+
+        {/* Labels slots */}
+        <div className="absolute bottom-0 left-0 right-0 grid grid-cols-5 z-20 pointer-events-none">
+          {SLOT_LABELS.map((l, i) => (
+            <div key={i} className={`text-center py-2 text-xs font-bold uppercase border-t-2 ${i === 2 ? "bg-success text-white border-white" : i === 0 || i === 4 ? "bg-accent text-accent-foreground border-white" : "bg-primary text-primary-foreground border-white"}`}>
+              {l}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {!dropped && (
+        <button onClick={drop} className="mt-4 px-10 py-4 rounded-2xl bg-gradient-gold text-accent-foreground text-lg font-bold uppercase glow-gold active:scale-95">
+          🏆 Lâcher le ballon
+        </button>
       )}
+      {dropped && !done && <p className="mt-4 text-primary-foreground font-bold animate-pulse-glow">⚽ En cours…</p>}
     </div>
   );
 }

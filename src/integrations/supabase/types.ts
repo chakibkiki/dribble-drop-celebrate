@@ -14,7 +14,119 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      animator_sessions: {
+        Row: {
+          animator_name: string
+          closed_at: string | null
+          id: string
+          started_at: string
+          store_name: string
+          store_type: string
+          wilaya: string
+        }
+        Insert: {
+          animator_name: string
+          closed_at?: string | null
+          id?: string
+          started_at?: string
+          store_name: string
+          store_type: string
+          wilaya: string
+        }
+        Update: {
+          animator_name?: string
+          closed_at?: string | null
+          id?: string
+          started_at?: string
+          store_name?: string
+          store_type?: string
+          wilaya?: string
+        }
+        Relationships: []
+      }
+      participants: {
+        Row: {
+          age: number
+          created_at: string
+          full_name: string
+          id: string
+          phone: string | null
+          session_id: string
+        }
+        Insert: {
+          age: number
+          created_at?: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          session_id: string
+        }
+        Update: {
+          age?: number
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "animator_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prize_distributions: {
+        Row: {
+          attempt_number: number
+          created_at: string
+          gift_key: string
+          gift_label: string
+          id: string
+          participant_id: string
+          session_id: string
+          tier: number
+        }
+        Insert: {
+          attempt_number: number
+          created_at?: string
+          gift_key: string
+          gift_label: string
+          id?: string
+          participant_id: string
+          session_id: string
+          tier: number
+        }
+        Update: {
+          attempt_number?: number
+          created_at?: string
+          gift_key?: string
+          gift_label?: string
+          id?: string
+          participant_id?: string
+          session_id?: string
+          tier?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prize_distributions_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prize_distributions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "animator_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
