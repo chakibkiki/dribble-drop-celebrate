@@ -1,10 +1,16 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import confetti from "canvas-confetti";
 import { GIFTS } from "@/lib/quotaConfig";
+import bg1 from "@/assets/win-bg-1.jpg";
+import bg2 from "@/assets/win-bg-2.jpg";
+import bg3 from "@/assets/win-bg-3.jpg";
+
+const BACKGROUNDS = [bg1, bg2, bg3];
 
 export default function PrizeReveal({ tier, giftKey, giftLabel, onContinue }: { tier: 1 | 2 | 3; giftKey: string; giftLabel: string; onContinue: () => void }) {
   const gift = GIFTS[giftKey];
   const fired = useRef(false);
+  const bg = useMemo(() => BACKGROUNDS[Math.floor(Math.random() * BACKGROUNDS.length)], []);
 
   useEffect(() => {
     if (fired.current) return;
@@ -25,23 +31,31 @@ export default function PrizeReveal({ tier, giftKey, giftLabel, onContinue }: { 
   }, []);
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-b from-secondary via-background to-secondary overflow-hidden flex flex-col items-center justify-center p-6">
-      <div className="text-center mb-6 animate-in fade-in zoom-in duration-500">
-        <p className="text-5xl md:text-6xl font-extrabold text-gradient-primary drop-shadow-lg">BRAVO ! 🎉</p>
-        <p className="text-lg text-muted-foreground uppercase tracking-widest mt-2">Vous avez gagné</p>
+    <div
+      className="min-h-screen w-full bg-cover bg-top bg-no-repeat flex flex-col items-center"
+      style={{ backgroundImage: `url(${bg})` }}
+    >
+      {/* Cadeau gagné, positionné dans la zone haute du visuel */}
+      <div className="mt-[18vh] flex flex-col items-center px-6 animate-in zoom-in-50 fade-in duration-700">
+        <div className="relative">
+          <div className="absolute inset-0 rounded-full bg-white/30 blur-3xl scale-110" />
+          <img
+            src={gift?.image}
+            alt={giftLabel}
+            className="relative max-h-[40vh] w-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.45)]"
+          />
+        </div>
+        <div className="mt-3 px-5 py-1.5 rounded-full bg-white/95 backdrop-blur shadow-lg">
+          <p className="text-base md:text-lg font-extrabold text-[#1a3c8c] uppercase tracking-wide">{giftLabel}</p>
+        </div>
       </div>
 
-      <div className="relative bg-card/95 backdrop-blur border-4 border-accent rounded-3xl p-6 shadow-2xl max-w-md w-full text-center animate-in zoom-in-50 duration-700">
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-gold text-accent-foreground text-xs font-bold uppercase px-4 py-1 rounded-full glow-gold">
-          Palier {tier}
-        </div>
-        <div className="bg-white rounded-2xl p-4 mb-4 flex items-center justify-center aspect-square overflow-hidden">
-          <img src={gift?.image} alt={giftLabel} className="max-h-full max-w-full object-contain animate-in zoom-in duration-1000" />
-        </div>
-        <p className="text-3xl font-extrabold text-gradient-primary">{giftLabel}</p>
-      </div>
+      <div className="flex-1" />
 
-      <button onClick={onContinue} className="mt-8 px-12 py-4 rounded-2xl bg-gradient-gold text-accent-foreground text-lg font-bold uppercase glow-gold active:scale-95 transition-transform">
+      <button
+        onClick={onContinue}
+        className="mb-8 px-12 py-4 rounded-full bg-gradient-gold text-accent-foreground text-lg font-extrabold uppercase tracking-wider glow-gold active:scale-95 transition-transform border-2 border-white shadow-[0_4px_0_rgba(0,0,0,0.25)]"
+      >
         Continuer
       </button>
     </div>
