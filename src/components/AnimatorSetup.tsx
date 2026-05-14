@@ -39,11 +39,14 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
   const pill = "w-full px-6 py-3 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
 
   return (
-    <div className="min-h-screen w-full bg-[#0a2a6e] overflow-y-auto flex flex-col items-center">
-      <div className="relative w-full">
-        <img src={introImg} alt="" className="w-full h-auto block select-none pointer-events-none" />
+    <div className="h-screen w-full bg-[#0a2a6e] overflow-hidden relative flex items-center justify-center">
+      <img
+        src={introImg}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover object-center select-none pointer-events-none"
+      />
 
-        <form onSubmit={submit} className="absolute left-1/2 -translate-x-1/2 w-full max-w-md bottom-[18%] px-6 space-y-3">
+      <form onSubmit={submit} className="relative z-10 w-full max-w-md px-6 space-y-3">
         <input
           className={pill}
           placeholder="Nom de l'Animateur"
