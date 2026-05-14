@@ -39,12 +39,12 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
   const pill = "w-full px-3 py-1.5 text-xs rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_3px_0_rgba(0,0,0,0.25)] border border-white focus:outline-none focus:ring-2 focus:ring-white/40";
 
   return (
-    <div className="relative h-screen w-full bg-[#0a2a6e] overflow-hidden">
-      {/* Background unique */}
+    <div className="relative h-screen w-full overflow-hidden">
+      {/* Background original */}
       <img
         src={introImg}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
+        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none z-0"
       />
 
       {/* Formulaire positionné au milieu haut, laisse les produits visibles en bas */}
