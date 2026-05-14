@@ -102,8 +102,8 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
       render: {
         sprite: {
           texture: ballImg,
-          xScale: (ballRadius * 2) / 200,
-          yScale: (ballRadius * 2) / 200,
+          xScale: (ballRadius * 2) / 256,
+          yScale: (ballRadius * 2) / 256,
         },
       },
     });
