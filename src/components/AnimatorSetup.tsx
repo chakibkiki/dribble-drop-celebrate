@@ -48,7 +48,7 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
       />
 
       {/* Formulaire positionné au milieu haut, laisse les produits visibles en bas */}
-      <div className="relative h-screen flex items-start justify-center px-6 pt-[44vh] z-10 mt-[14vh] >
+      <div className="relative h-screen flex items-start justify-center px-6 pt-[44vh] z-10 mt-[14vh]">
         <form onSubmit={submit} className="w-full max-w-[280px] space-y-1.5 bg-transparent">
         <input
           className={pill}
