@@ -44,9 +44,9 @@ export function pickGift(
   }
 
   const weights: { tier: 1 | 2 | 3; w: number }[] = [
-    { tier: 1, w: stockP1 },
-    { tier: 2, w: stockP2 },
-    { tier: 3, w: stockP3 * p3Mult },
+    { tier: 1 as const, w: stockP1 },
+    { tier: 2 as const, w: stockP2 },
+    { tier: 3 as const, w: stockP3 * p3Mult },
   ].filter((x) => x.w > 0);
 
   if (weights.length === 0) {
