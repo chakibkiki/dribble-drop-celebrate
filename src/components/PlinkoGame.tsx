@@ -177,11 +177,11 @@ export default function PlinkoGame({
           <img
             src={isisLogo}
             alt="ISIS"
-            className="absolute top-3 left-1/2 -translate-x-1/2 h-10 object-contain z-10"
+            className="absolute top-6 left-1/2 -translate-x-1/2 h-24 object-contain z-10 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
           />
           <div className="absolute top-1/2 left-0 right-0 border-t-2 border-white/40" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-2 border-white/40 flex items-center justify-center">
-            <img src={fafLogo} alt="FAF" className="w-20 h-20 object-contain opacity-80" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-44 flex items-center justify-center z-10">
+            <img src={fafLogo} alt="FAF" className="w-44 h-44 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]" />
           </div>
           <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-40 h-20 border-2 border-white/40 border-b-0" />
         </div>
