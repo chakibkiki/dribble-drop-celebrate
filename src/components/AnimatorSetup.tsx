@@ -39,14 +39,19 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
   const pill = "w-full px-6 py-3 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
 
   return (
-    <div className="h-screen w-full bg-[#0a2a6e] overflow-hidden relative flex items-center justify-center">
-      <img
-        src={introImg}
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover object-center select-none pointer-events-none"
+    <div className="min-h-screen w-full bg-[#0a2a6e] overflow-hidden relative flex flex-col items-center justify-center">
+      {/* Bandeau haut: logo + joueurs + titre */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[50vh] bg-no-repeat bg-top pointer-events-none"
+        style={{ backgroundImage: `url(${introImg})`, backgroundSize: "100% auto" }}
+      />
+      {/* Bandeau bas: produits + pelouse */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-[28vh] bg-no-repeat bg-bottom pointer-events-none"
+        style={{ backgroundImage: `url(${introImg})`, backgroundSize: "100% auto" }}
       />
 
-      <form onSubmit={submit} className="relative z-10 w-full max-w-md px-6 space-y-3">
+      <form onSubmit={submit} className="relative z-10 w-full max-w-md px-6 space-y-3 my-auto">
         <input
           className={pill}
           placeholder="Nom de l'Animateur"
