@@ -39,9 +39,9 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
   const pill = "w-full px-6 py-3 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
 
   return (
-    <div className="h-screen w-full bg-[#0a2a6e] overflow-hidden flex flex-col">
+    <div className="min-h-screen w-full bg-[#0a2a6e] flex flex-col">
       {/* Bandeau haut : joueurs + titre */}
-      <div className="relative w-full h-[48vh] overflow-hidden flex-shrink-0">
+      <div className="relative w-full h-[55vh] min-h-[360px] overflow-hidden flex-shrink-0">
         <img
           src={introImg}
           alt=""
@@ -50,8 +50,8 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
       </div>
 
       {/* Formulaire au centre */}
-      <div className="flex-1 flex items-center justify-center px-6 py-3 min-h-0">
-        <form onSubmit={submit} className="w-full max-w-md space-y-3">
+      <div className="flex-1 flex items-center justify-center px-6 py-4">
+        <form onSubmit={submit} className="w-full max-w-md space-y-2">
         <input
           className={pill}
           placeholder="Nom de l'Animateur"
@@ -109,7 +109,7 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
       </div>
 
       {/* Bandeau bas : produits */}
-      <div className="relative w-full h-[26vh] overflow-hidden flex-shrink-0">
+      <div className="relative w-full h-[22vh] min-h-[150px] overflow-hidden flex-shrink-0">
         <img
           src={introImg}
           alt=""
