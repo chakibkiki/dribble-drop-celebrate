@@ -101,7 +101,7 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-4 rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider glow-gold disabled:opacity-50 shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white"
+          className="w-full py-2.5 text-sm rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider glow-gold disabled:opacity-50 shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white"
         >
           {loading ? "..." : "Démarrer la journée"}
         </button>
