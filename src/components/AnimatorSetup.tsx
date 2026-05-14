@@ -106,6 +106,16 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
           {loading ? "..." : "Démarrer la journée"}
         </button>
       </form>
+      </div>
+
+      {/* Bandeau bas : produits */}
+      <div className="relative w-full h-[26vh] overflow-hidden flex-shrink-0">
+        <img
+          src={introImg}
+          alt=""
+          className="absolute bottom-0 left-0 w-full h-auto select-none pointer-events-none"
+        />
+      </div>
     </div>
   );
 }
