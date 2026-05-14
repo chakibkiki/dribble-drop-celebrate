@@ -17,7 +17,7 @@ const Index = () => {
   const [participantId, setParticipantId] = useState<string | null>(null);
   const [targetSlot, setTargetSlot] = useState(2);
   const [pendingPrize, setPendingPrize] = useState<{ key: string; label: string; tier: 1 | 2 | 3 } | null>(null);
-  const [revealed, setRevealed] = useState<{ tier: 1 | 2 | 3; label: string } | null>(null);
+  const [revealed, setRevealed] = useState<{ tier: 1 | 2 | 3; label: string; key: string } | null>(null);
 
   // Au démarrage : vérifier la session locale
   useEffect(() => {
@@ -72,7 +72,7 @@ const Index = () => {
       gift_label: pendingPrize.label,
       attempt_number: (count ?? 0) + 1,
     });
-    setRevealed({ tier: pendingPrize.tier, label: pendingPrize.label });
+    setRevealed({ tier: pendingPrize.tier, label: pendingPrize.label, key: pendingPrize.key });
     setPendingPrize(null);
     setParticipantId(null);
     setStage("reveal");
@@ -83,7 +83,7 @@ const Index = () => {
   if (stage === "dashboard" && sessionId) return <Dashboard sessionId={sessionId} onPlay={startNewParticipant} onClosed={() => { setSessionId(null); setStage("setup"); }} />;
   if (stage === "form" && sessionId) return <ParticipantForm sessionId={sessionId} onReady={onParticipantReady} onBack={() => setStage("dashboard")} />;
   if (stage === "game") return <PlinkoGame targetSlot={targetSlot} onSettled={onBallSettled} onBack={() => setStage("dashboard")} />;
-  if (stage === "reveal" && revealed) return <PrizeReveal tier={revealed.tier} giftLabel={revealed.label} onContinue={() => { setRevealed(null); setStage("dashboard"); }} />;
+  if (stage === "reveal" && revealed) return <PrizeReveal tier={revealed.tier} giftKey={revealed.key} giftLabel={revealed.label} onContinue={() => { setRevealed(null); setStage("dashboard"); }} />;
   return null;
 };
 
