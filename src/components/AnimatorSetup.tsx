@@ -36,42 +36,68 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
     onReady(data.id);
   };
 
+  const pill = "w-full px-6 py-3 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
+
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-end p-4 overflow-y-auto bg-cover bg-center bg-no-repeat"
+      className="min-h-screen w-full bg-cover bg-top bg-no-repeat overflow-y-auto"
       style={{ backgroundImage: `url(${introImg})` }}
     >
-      <form onSubmit={submit} className="w-full max-w-md bg-card/95 backdrop-blur border border-border rounded-2xl p-6 space-y-4 shadow-2xl mt-4 mb-4">
-        <h2 className="text-2xl text-center text-gradient-primary">Démarrage Animateur</h2>
-        <p className="text-center text-sm text-muted-foreground -mt-2">Renseignez vos informations pour commencer la journée</p>
+      {/* Spacer to let the visual breathe at top (logo + players + title) */}
+      <div className="h-[55vh] min-h-[380px]" />
 
-        <div>
-          <label className="text-sm font-semibold">Nom et prénom *</label>
-          <input className="w-full mt-1 px-3 py-2 rounded-lg bg-input border border-border text-foreground" value={form.animator_name} onChange={(e) => setForm({ ...form, animator_name: e.target.value })} maxLength={100} />
-        </div>
-        <div>
-          <label className="text-sm font-semibold">Wilaya *</label>
-          <input className="w-full mt-1 px-3 py-2 rounded-lg bg-input border border-border text-foreground" value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value })} maxLength={60} />
-        </div>
-        <div>
-          <label className="text-sm font-semibold">Nom du magasin *</label>
-          <input className="w-full mt-1 px-3 py-2 rounded-lg bg-input border border-border text-foreground" value={form.store_name} onChange={(e) => setForm({ ...form, store_name: e.target.value })} maxLength={120} />
-        </div>
-        <div>
-          <label className="text-sm font-semibold">Type de magasin *</label>
-          <div className="grid grid-cols-3 gap-2 mt-1">
-            {(["top_mt", "mt", "mm"] as StoreType[]).map((t) => (
-              <button type="button" key={t} onClick={() => setForm({ ...form, store_type: t })} className={`py-2 rounded-lg border text-sm font-bold transition ${form.store_type === t ? "bg-primary text-primary-foreground border-primary" : "bg-input border-border text-foreground"}`}>
-                {STORE_TYPE_LABEL[t]}
-              </button>
-            ))}
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">{form.store_type === "mm" ? "Quota : 60 cadeaux/jour" : "Quota : 80 cadeaux/jour"}</p>
-        </div>
+      <form onSubmit={submit} className="w-full max-w-md mx-auto px-6 pb-8 space-y-3">
+        <input
+          className={pill}
+          placeholder="Nom de l'Animateur"
+          value={form.animator_name}
+          onChange={(e) => setForm({ ...form, animator_name: e.target.value })}
+          maxLength={100}
+        />
+        <input
+          className={pill}
+          placeholder="La Ville"
+          value={form.wilaya}
+          onChange={(e) => setForm({ ...form, wilaya: e.target.value })}
+          maxLength={60}
+        />
+        <input
+          className={pill}
+          placeholder="Nom du Magasin"
+          value={form.store_name}
+          onChange={(e) => setForm({ ...form, store_name: e.target.value })}
+          maxLength={120}
+        />
 
-        {err && <p className="text-sm text-destructive">{err}</p>}
+        <div className="grid grid-cols-3 gap-2 pt-1">
+          {(["top_mt", "mt", "mm"] as StoreType[]).map((t) => (
+            <button
+              type="button"
+              key={t}
+              onClick={() => setForm({ ...form, store_type: t })}
+              className={`py-2 rounded-full border-2 text-sm font-bold uppercase transition shadow-[0_3px_0_rgba(0,0,0,0.2)] ${
+                form.store_type === t
+                  ? "bg-white text-[#e63946] border-white"
+                  : "bg-white/20 text-white border-white/70 backdrop-blur"
+              }`}
+            >
+              {STORE_TYPE_LABEL[t]}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-white text-center font-semibold drop-shadow">
+          {form.store_type === "mm" ? "Quota : 60 cadeaux/jour" : "Quota : 80 cadeaux/jour"}
+        </p>
 
-        <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-gold text-accent-foreground font-bold uppercase tracking-wider glow-gold disabled:opacity-50">
+        {err && (
+          <p className="text-sm text-white bg-destructive/90 rounded-lg px-3 py-2 text-center font-semibold">{err}</p>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-4 rounded-full bg-gradient-gold text-accent-foreground font-extrabold uppercase tracking-wider glow-gold disabled:opacity-50 shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white"
+        >
           {loading ? "..." : "Démarrer la journée"}
         </button>
       </form>
