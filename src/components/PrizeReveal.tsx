@@ -32,17 +32,17 @@ export default function PrizeReveal({ tier, giftKey, giftLabel, onContinue }: { 
 
   return (
     <div
-      className="min-h-screen w-full bg-cover bg-top bg-no-repeat flex flex-col items-center"
+      className="min-h-screen w-full bg-contain bg-top bg-no-repeat flex flex-col items-center bg-[#0a2a6e]"
       style={{ backgroundImage: `url(${bg})` }}
     >
       {/* Cadeau gagné, positionné dans la zone haute du visuel */}
-      <div className="mt-[18vh] flex flex-col items-center px-6 animate-in zoom-in-50 fade-in duration-700">
+      <div className="mt-[16vh] flex flex-col items-center px-6 animate-in zoom-in-50 fade-in duration-700">
         <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-white/30 blur-3xl scale-110" />
+          <div className="absolute inset-0 rounded-full bg-white/20 blur-3xl scale-110" />
           <img
             src={gift?.image}
             alt={giftLabel}
-            className="relative max-h-[40vh] w-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.45)]"
+            className="relative max-h-[26vh] w-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.45)]"
           />
         </div>
         <div className="mt-3 px-5 py-1.5 rounded-full bg-white/95 backdrop-blur shadow-lg">

@@ -1,9 +1,9 @@
-import produit300g from "@/assets/gifts/produit_300g.jpeg";
-import bracelet from "@/assets/gifts/bracelet.jpeg";
-import magnet from "@/assets/gifts/magnet.jpeg";
-import sacTnt from "@/assets/gifts/sac_tnt.jpeg";
-import tshirt from "@/assets/gifts/tshirt.jpeg";
-import sacADos from "@/assets/gifts/sac_a_dos.jpeg";
+import produit300g from "@/assets/gifts/produit_300g.png";
+import bracelet from "@/assets/gifts/bracelet.png";
+import magnet from "@/assets/gifts/magnet.png";
+import sacTnt from "@/assets/gifts/sac_tnt.png";
+import tshirt from "@/assets/gifts/tshirt.png";
+import sacADos from "@/assets/gifts/sac_a_dos.png";
 
 export type StoreType = "top_mt" | "mt" | "mm";
 
