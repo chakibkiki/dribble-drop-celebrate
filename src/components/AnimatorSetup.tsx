@@ -51,22 +51,22 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
       <div className="relative h-screen flex items-center justify-center px-6 z-10">
         <form onSubmit={submit} className="w-full max-w-[280px] grid grid-cols-3 gap-1.5 bg-transparent mx-[20px]">
           <input
-            className={`${pill} col-span-3`}
-            placeholder="Nom de l'Animateur"
+            className={`${pill} col-span-1`}
+            placeholder="Animateur"
             value={form.animator_name}
             onChange={(e) => setForm({ ...form, animator_name: e.target.value })}
             maxLength={100}
           />
           <input
-            className={`${pill} col-span-3`}
-            placeholder="La Ville"
+            className={`${pill} col-span-1`}
+            placeholder="Ville"
             value={form.wilaya}
             onChange={(e) => setForm({ ...form, wilaya: e.target.value })}
             maxLength={60}
           />
           <input
-            className={`${pill} col-span-3`}
-            placeholder="Nom du Magasin"
+            className={`${pill} col-span-1`}
+            placeholder="Magasin"
             value={form.store_name}
             onChange={(e) => setForm({ ...form, store_name: e.target.value })}
             maxLength={120}
