@@ -45,9 +45,6 @@ export default function PrizeReveal({ tier, giftKey, giftLabel, onContinue }: { 
             className="relative max-h-[26vh] w-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.45)]"
           />
         </div>
-        <div className="mt-3 px-5 py-1.5 rounded-full bg-white/95 backdrop-blur shadow-lg">
-          <p className="text-base md:text-lg font-extrabold text-[#1a3c8c] uppercase tracking-wide">{giftLabel}</p>
-        </div>
       </div>
 
       <div className="flex-1" />
