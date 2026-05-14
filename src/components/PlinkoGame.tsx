@@ -9,7 +9,15 @@ import isisLogo from "@/assets/isis-logo.png";
  * Jeu Plinko sur fond terrain de foot vertical avec 5 cases.
  * Le ballon est subtilement guidé vers le slot cible (déterminé en amont par l'algo).
  */
-export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSlot: number; onSettled: () => void; onBack: () => void }) {
+export default function PlinkoGame({
+  targetSlot,
+  onSettled,
+  onBack,
+}: {
+  targetSlot: number;
+  onSettled: () => void;
+  onBack: () => void;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
   const [dropped, setDropped] = useState(false);
@@ -31,7 +39,13 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
     const render = Matter.Render.create({
       canvas,
       engine,
-      options: { width: W, height: H, wireframes: false, background: "transparent", pixelRatio: window.devicePixelRatio || 1 },
+      options: {
+        width: W,
+        height: H,
+        wireframes: false,
+        background: "transparent",
+        pixelRatio: window.devicePixelRatio || 1,
+      },
     });
 
     // Murs
@@ -59,7 +73,7 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
             isStatic: true,
             render: { fillStyle: "#ffffff" },
             restitution: 0.4,
-          })
+          }),
         );
       }
     }
@@ -74,7 +88,7 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
         Matter.Bodies.rectangle(i * slotW, slotTop + 55, 4, 110, {
           isStatic: true,
           render: { fillStyle: "#ffffff" },
-        })
+        }),
       );
     }
 
@@ -92,7 +106,8 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
   const drop = () => {
     if (!engineRef.current || dropped) return;
     setDropped(true);
-    const W = 420, H = 720;
+    const W = 420,
+      H = 720;
     const slotW = W / 5;
     const targetX = slotW * targetSlot + slotW / 2;
 
@@ -147,15 +162,23 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
   return (
     <div className="min-h-screen bg-primary flex flex-col items-center p-3 overflow-hidden">
       <div className="w-full max-w-md flex justify-between items-center mb-2">
-        <button onClick={onBack} className="text-primary-foreground/80 text-sm">← Retour</button>
-        <img src={isisLogo} alt="ISIS" className="h-8 object-contain" />
+        <button onClick={onBack} className="text-primary-foreground/80 text-sm">
+          ← Retour
+        </button>
         <span className="w-12" />
       </div>
 
-      <div className="relative bg-gradient-to-b from-green-700 to-green-900 rounded-xl border-4 border-primary-foreground/20 overflow-hidden" style={{ width: 420, maxWidth: "100%" }}>
+      <div
+        className="relative bg-gradient-to-b from-green-700 to-green-900 rounded-xl border-4 border-primary-foreground/20 overflow-hidden"
+        style={{ width: 420, maxWidth: "100%" }}
+      >
         {/* Lignes terrain */}
         <div className="absolute inset-0 pointer-events-none">
-          <img src={isisLogo} alt="ISIS" className="absolute top-3 left-1/2 -translate-x-1/2 h-10 object-contain z-10" />
+          <img
+            src={isisLogo}
+            alt="ISIS"
+            className="absolute top-3 left-1/2 -translate-x-1/2 h-10 object-contain z-10"
+          />
           <div className="absolute top-1/2 left-0 right-0 border-t-2 border-white/40" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-2 border-white/40 flex items-center justify-center">
             <img src={fafLogo} alt="FAF" className="w-20 h-20 object-contain opacity-80" />
@@ -163,12 +186,19 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
           <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-40 h-20 border-2 border-white/40 border-b-0" />
         </div>
 
-        <canvas ref={canvasRef} className="relative z-10" style={{ touchAction: "none", display: "block", maxWidth: "100%" }} />
+        <canvas
+          ref={canvasRef}
+          className="relative z-10"
+          style={{ touchAction: "none", display: "block", maxWidth: "100%" }}
+        />
 
         {/* Labels slots */}
         <div className="absolute bottom-0 left-0 right-0 grid grid-cols-5 z-20 pointer-events-none">
           {SLOT_LABELS.map((l, i) => (
-            <div key={i} className={`text-center py-2 text-xs font-bold uppercase border-t-2 ${i === 2 ? "bg-success text-white border-white" : i === 0 || i === 4 ? "bg-accent text-accent-foreground border-white" : "bg-primary text-primary-foreground border-white"}`}>
+            <div
+              key={i}
+              className={`text-center py-2 text-xs font-bold uppercase border-t-2 ${i === 2 ? "bg-success text-white border-white" : i === 0 || i === 4 ? "bg-accent text-accent-foreground border-white" : "bg-primary text-primary-foreground border-white"}`}
+            >
               {l}
             </div>
           ))}
@@ -176,7 +206,10 @@ export default function PlinkoGame({ targetSlot, onSettled, onBack }: { targetSl
       </div>
 
       {!dropped && (
-        <button onClick={drop} className="mt-4 px-10 py-4 rounded-2xl bg-gradient-gold text-accent-foreground text-lg font-bold uppercase glow-gold active:scale-95">
+        <button
+          onClick={drop}
+          className="mt-4 px-10 py-4 rounded-2xl bg-gradient-gold text-accent-foreground text-lg font-bold uppercase glow-gold active:scale-95"
+        >
           🏆 Lâcher le ballon
         </button>
       )}
