@@ -36,22 +36,22 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
     onReady(data.id);
   };
 
-  const pill = "w-full px-6 py-3 rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
+  const pill = "w-full px-4 py-2 text-sm rounded-full bg-[#e63946] text-white placeholder:text-white/95 placeholder:font-bold text-center font-bold shadow-[0_4px_0_rgba(0,0,0,0.25)] border-2 border-white focus:outline-none focus:ring-4 focus:ring-white/40";
 
   return (
-    <div className="min-h-screen w-full bg-[#0a2a6e] flex flex-col">
+    <div className="relative min-h-screen w-full bg-[#0a2a6e] overflow-hidden">
       {/* Bandeau haut : joueurs + titre */}
-      <div className="relative w-full h-[55vh] min-h-[360px] overflow-hidden flex-shrink-0">
-        <img
-          src={introImg}
-          alt=""
-          className="absolute top-0 left-0 w-full h-auto select-none pointer-events-none"
-        />
+      <div className="absolute top-0 left-0 right-0 h-[60vh] overflow-hidden pointer-events-none">
+        <img src={introImg} alt="" className="absolute top-0 left-0 w-full h-auto" />
+      </div>
+      {/* Bandeau bas : produits */}
+      <div className="absolute bottom-0 left-0 right-0 h-[45vh] overflow-hidden pointer-events-none">
+        <img src={introImg} alt="" className="absolute bottom-0 left-0 w-full h-auto" />
       </div>
 
-      {/* Formulaire au centre */}
-      <div className="flex-1 flex items-center justify-center px-6 py-4">
-        <form onSubmit={submit} className="w-full max-w-md space-y-2">
+      {/* Formulaire au centre, transparent */}
+      <div className="relative min-h-screen flex items-center justify-center px-6 py-4 z-10">
+        <form onSubmit={submit} className="w-full max-w-sm space-y-2 bg-transparent">
         <input
           className={pill}
           placeholder="Nom de l'Animateur"
