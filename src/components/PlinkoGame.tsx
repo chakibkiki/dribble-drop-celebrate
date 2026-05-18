@@ -187,7 +187,7 @@ export default function PlinkoGame({
         style={{
           width: 420,
           maxWidth: "100%",
-          backgroundColor: "#649f46",
+          backgroundColor: "#4f8a36",
         }}
       >
         {/* Lignes terrain */}
@@ -216,7 +216,10 @@ export default function PlinkoGame({
         />
 
         {/* Labels slots */}
-        <div className="absolute bottom-0 left-0 right-0 grid grid-cols-5 z-20 pointer-events-none gap-1 px-1 pb-1">
+        <div
+          className="absolute bottom-0 left-0 right-0 grid z-20 pointer-events-none gap-1 px-1 pb-1 items-end"
+          style={{ gridTemplateColumns: "1fr 1fr 1.5fr 1fr 1fr" }}
+        >
           {SLOT_LABELS.map((l, i) => {
             const isGoal = i === 2;
             const isYellow = i === 0 || i === 4;
@@ -233,7 +236,7 @@ export default function PlinkoGame({
                 <span className="text-[11px] font-extrabold uppercase leading-tight pt-0.5">{l}</span>
                 <div
                   className="flex-1 w-full mt-1 rounded-md"
-                  style={{ backgroundColor: "#5d9a45" }}
+                  style={{ backgroundColor: "#3f7a2a" }}
                 />
               </div>
             );
