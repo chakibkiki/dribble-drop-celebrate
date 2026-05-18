@@ -113,9 +113,10 @@ export default function PlinkoGame({
 
     const ballRadius = 20;
     const ball = Matter.Bodies.circle(W / 2 + (Math.random() - 0.5) * 30, 30, ballRadius, {
-      restitution: 0.3,
-      friction: 0.06,
-      density: 0.003,
+      restitution: 0.35,
+      friction: 0.05,
+      frictionAir: 0.012,
+      density: 0.004,
       render: {
         sprite: {
           texture: ballImg,
@@ -126,28 +127,41 @@ export default function PlinkoGame({
     });
     Matter.Composite.add(engineRef.current.world, ball);
 
-    // Guidage progressif : force latérale croissante pour garantir le slot cible
+    // Guidage naturel : très léger en haut, plus marqué près des slots
     const slotTop = H - 110;
+    const floorY = H - 30;
+    let lockedToTarget = false;
     const guide = setInterval(() => {
       if (!engineRef.current) return;
       const dx = targetX - ball.position.x;
       const y = ball.position.y;
-      // Proximité grandit doucement, puis très fortement près des slots
-      let proximity = Math.max(0, Math.min(1, (y - 100) / (H - 250)));
-      let strength = 0.0008;
-      if (y > slotTop - 80) {
-        // Approche finale : verrouillage sur la colonne cible
-        proximity = 1;
-        strength = 0.004;
-        // Repositionne directement si toujours hors colonne juste avant l'entrée
-        if (y > slotTop - 20 && Math.abs(dx) > 8) {
+
+      if (y < slotTop - 120) {
+        // Phase 1 : chute libre quasi naturelle, micro-biais
+        const proximity = Math.max(0, (y - 120) / (slotTop - 240));
+        const force = (dx / W) * 0.0006 * proximity * ball.mass;
+        Matter.Body.applyForce(ball, ball.position, { x: force, y: 0 });
+      } else if (y < slotTop) {
+        // Phase 2 : approche, on amène progressivement vers la colonne cible
+        const force = (dx / W) * 0.0035 * ball.mass;
+        Matter.Body.applyForce(ball, ball.position, { x: force, y: 0 });
+      } else {
+        // Phase 3 : entrée dans le palier — verrouille X, garde la vitesse Y
+        if (!lockedToTarget) {
+          lockedToTarget = true;
           Matter.Body.setPosition(ball, { x: targetX, y });
-          Matter.Body.setVelocity(ball, { x: 0, y: Math.max(2, ball.velocity.y) });
+          Matter.Body.setVelocity(ball, {
+            x: 0,
+            y: Math.max(2.5, Math.min(6, ball.velocity.y)),
+          });
+        } else {
+          // Maintien doux sur la colonne cible (amortit les rebonds latéraux)
+          const corrected = ball.position.x + (targetX - ball.position.x) * 0.35;
+          Matter.Body.setPosition(ball, { x: corrected, y: ball.position.y });
+          Matter.Body.setVelocity(ball, { x: 0, y: ball.velocity.y });
         }
       }
-      const force = (dx / W) * strength * proximity * ball.mass;
-      Matter.Body.applyForce(ball, ball.position, { x: force, y: 0 });
-    }, 25);
+    }, 20);
 
     let finished = false;
     const finish = () => {
@@ -160,15 +174,22 @@ export default function PlinkoGame({
       onSettled();
     };
 
+    // Stabilisation : freine puis fige le ballon dans le palier
     const settle = setInterval(() => {
+      if (!lockedToTarget) return;
       const v = ball.velocity;
       const speed = Math.sqrt(v.x * v.x + v.y * v.y);
-      if (ball.position.y > H - 80 && speed < 1) {
+      if (ball.position.y >= floorY - ballRadius - 4 && speed < 1.2) {
+        // Pose proprement le ballon au fond du palier et stoppe la physique
+        Matter.Body.setPosition(ball, { x: targetX, y: floorY - ballRadius });
+        Matter.Body.setVelocity(ball, { x: 0, y: 0 });
+        Matter.Body.setAngularVelocity(ball, 0);
+        Matter.Body.setStatic(ball, true);
         clearInterval(settle);
         clearInterval(guide);
-        setTimeout(finish, 400);
+        setTimeout(finish, 500);
       }
-    }, 100);
+    }, 80);
 
     const safety = setTimeout(finish, 12000);
   };
