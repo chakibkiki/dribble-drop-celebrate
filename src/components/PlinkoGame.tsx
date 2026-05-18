@@ -211,7 +211,7 @@ export default function PlinkoGame({
 
         <canvas
           ref={canvasRef}
-          className="relative z-10"
+          className="relative z-30"
           style={{ touchAction: "none", display: "block", maxWidth: "100%" }}
         />
 
