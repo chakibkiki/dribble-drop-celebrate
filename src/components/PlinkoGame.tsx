@@ -126,14 +126,28 @@ export default function PlinkoGame({
     });
     Matter.Composite.add(engineRef.current.world, ball);
 
-    // Guidage subtil : applique une petite force latérale chaque tick
+    // Guidage progressif : force latérale croissante pour garantir le slot cible
+    const slotTop = H - 110;
     const guide = setInterval(() => {
       if (!engineRef.current) return;
       const dx = targetX - ball.position.x;
-      const proximity = Math.max(0, Math.min(1, (ball.position.y - 100) / (H - 200)));
-      const force = (dx / W) * 0.0006 * proximity * ball.mass;
+      const y = ball.position.y;
+      // Proximité grandit doucement, puis très fortement près des slots
+      let proximity = Math.max(0, Math.min(1, (y - 100) / (H - 250)));
+      let strength = 0.0008;
+      if (y > slotTop - 80) {
+        // Approche finale : verrouillage sur la colonne cible
+        proximity = 1;
+        strength = 0.004;
+        // Repositionne directement si toujours hors colonne juste avant l'entrée
+        if (y > slotTop - 20 && Math.abs(dx) > 8) {
+          Matter.Body.setPosition(ball, { x: targetX, y });
+          Matter.Body.setVelocity(ball, { x: 0, y: Math.max(2, ball.velocity.y) });
+        }
+      }
+      const force = (dx / W) * strength * proximity * ball.mass;
       Matter.Body.applyForce(ball, ball.position, { x: force, y: 0 });
-    }, 30);
+    }, 25);
 
     let finished = false;
     const finish = () => {
@@ -160,9 +174,9 @@ export default function PlinkoGame({
   };
 
   return (
-    <div className="min-h-screen bg-primary flex flex-col items-center p-3 overflow-hidden">
+    <div className="min-h-screen bg-[#e30613] flex flex-col items-center p-3 overflow-hidden">
       <div className="w-full max-w-md flex justify-between items-center mb-2">
-        <button onClick={onBack} className="text-primary-foreground/80 text-sm">
+        <button onClick={onBack} className="text-white/80 text-sm">
           ← Retour
         </button>
         <span className="w-12" />
@@ -177,11 +191,11 @@ export default function PlinkoGame({
           <img
             src={isisLogo}
             alt="ISIS"
-            className="absolute top-6 left-1/2 -translate-x-1/2 h-24 object-contain z-10 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
+            className="absolute top-6 left-1/2 -translate-x-1/2 h-24 object-contain z-20 drop-shadow-[0_0_18px_rgba(255,255,255,0.9)]"
           />
           <div className="absolute top-1/2 left-0 right-0 border-t-2 border-white/40" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-44 flex items-center justify-center z-10">
-            <img src={fafLogo} alt="FAF" className="w-44 h-44 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 flex items-center justify-center z-20">
+            <img src={fafLogo} alt="FAF" className="w-40 h-40 object-contain drop-shadow-[0_0_16px_rgba(255,255,255,0.7)]" />
           </div>
           <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-40 h-20 border-2 border-white/40 border-b-0" />
         </div>
@@ -194,14 +208,23 @@ export default function PlinkoGame({
 
         {/* Labels slots */}
         <div className="absolute bottom-0 left-0 right-0 grid grid-cols-5 z-20 pointer-events-none">
-          {SLOT_LABELS.map((l, i) => (
-            <div
-              key={i}
-              className={`text-center py-2 text-xs font-bold uppercase border-t-2 ${i === 2 ? "bg-success text-white border-white" : i === 0 || i === 4 ? "bg-accent text-accent-foreground border-white" : "bg-primary text-primary-foreground border-white"}`}
-            >
-              {l}
-            </div>
-          ))}
+          {SLOT_LABELS.map((l, i) => {
+            const isGoal = i === 2;
+            const isYellow = i === 0 || i === 4;
+            const base = isGoal
+              ? "bg-[#1e9d4a] text-white"
+              : isYellow
+              ? "bg-[#ffd400] text-[#e30613]"
+              : "bg-white text-[#e30613]";
+            return (
+              <div
+                key={i}
+                className={`text-center py-2 text-[11px] font-extrabold uppercase border-t-2 border-white ${base}`}
+              >
+                {l}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -213,7 +236,7 @@ export default function PlinkoGame({
           🏆 Lâcher le ballon
         </button>
       )}
-      {dropped && !done && <p className="mt-4 text-primary-foreground font-bold animate-pulse-glow">⚽ En cours…</p>}
+      {dropped && !done && <p className="mt-4 text-white font-bold animate-pulse-glow">⚽ En cours…</p>}
     </div>
   );
 }

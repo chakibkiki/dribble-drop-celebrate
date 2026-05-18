@@ -15,7 +15,7 @@ export const GIFTS: Record<string, GiftDef> = {
   magnet: { key: "magnet", label: "Magnet", tier: 2, image: magnet },
   sac_tnt: { key: "sac_tnt", label: "Sac en TNT", tier: 2, image: sacTnt },
   tshirt: { key: "tshirt", label: "T-shirt", tier: 3, image: tshirt },
-  sac_a_dos: { key: "sac_a_dos", label: "Sac à dos", tier: 3, image: sacADos },
+  sac_a_dos: { key: "sac_a_dos", label: "Sac à cordon", tier: 3, image: sacADos },
 };
 
 export type QuotaConfig = {

@@ -93,3 +93,4 @@ export function tierToSlot(tier: 1 | 2 | 3): number {
 }
 
 export const SLOT_LABELS = ["Palier 02", "Palier 01", "GOAL!", "Palier 01", "Palier 02"];
+export const SLOT_COLORS: ("yellow" | "red" | "green")[] = ["yellow", "red", "green", "red", "yellow"];
