@@ -246,7 +246,8 @@ export default function PlinkoGame({
           <img
             src={isisLogo}
             alt="ISIS"
-            className="absolute top-6 left-1/2 -translate-x-1/2 h-24 object-contain z-20 drop-shadow-[0_0_18px_rgba(255,255,255,0.9)]"
+            className="absolute left-1/2 -translate-x-1/2 h-24 object-contain z-20 drop-shadow-[0_0_18px_rgba(255,255,255,0.9)]"
+            style={{ top: 114 }}
           />
           <div className="absolute top-1/2 left-0 right-0 border-t-2 border-white/40" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 flex items-center justify-center z-20">
