@@ -126,14 +126,28 @@ export default function PlinkoGame({
     });
     Matter.Composite.add(engineRef.current.world, ball);
 
-    // Guidage subtil : applique une petite force latérale chaque tick
+    // Guidage progressif : force latérale croissante pour garantir le slot cible
+    const slotTop = H - 110;
     const guide = setInterval(() => {
       if (!engineRef.current) return;
       const dx = targetX - ball.position.x;
-      const proximity = Math.max(0, Math.min(1, (ball.position.y - 100) / (H - 200)));
-      const force = (dx / W) * 0.0006 * proximity * ball.mass;
+      const y = ball.position.y;
+      // Proximité grandit doucement, puis très fortement près des slots
+      let proximity = Math.max(0, Math.min(1, (y - 100) / (H - 250)));
+      let strength = 0.0008;
+      if (y > slotTop - 80) {
+        // Approche finale : verrouillage sur la colonne cible
+        proximity = 1;
+        strength = 0.004;
+        // Repositionne directement si toujours hors colonne juste avant l'entrée
+        if (y > slotTop - 20 && Math.abs(dx) > 8) {
+          Matter.Body.setPosition(ball, { x: targetX, y });
+          Matter.Body.setVelocity(ball, { x: 0, y: Math.max(2, ball.velocity.y) });
+        }
+      }
+      const force = (dx / W) * strength * proximity * ball.mass;
       Matter.Body.applyForce(ball, ball.position, { x: force, y: 0 });
-    }, 30);
+    }, 25);
 
     let finished = false;
     const finish = () => {
