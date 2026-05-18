@@ -249,9 +249,13 @@ export default function PlinkoGame({
             className="absolute left-1/2 -translate-x-1/2 h-24 object-contain z-20 drop-shadow-[0_0_18px_rgba(255,255,255,0.9)]"
             style={{ top: 114 }}
           />
-          <div className="absolute top-1/2 left-0 right-0 border-t-2 border-white/40" />
+          <div className="absolute top-1/2 left-0 right-0 border-t-2 border-white/70" />
+          {/* Rond central du terrain */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-44 rounded-full border-2 border-white/80 z-10" />
+          {/* Point central */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white/80 z-10" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 flex items-center justify-center z-20">
-            <img src={fafLogo} alt="FAF" className="w-40 h-40 object-contain drop-shadow-[0_0_16px_rgba(255,255,255,0.7)]" />
+            <img src={fafLogo} alt="FAF" className="w-36 h-36 object-contain drop-shadow-[0_0_16px_rgba(255,255,255,0.7)]" />
           </div>
           <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-40 h-20 border-2 border-white/40 border-b-0" />
         </div>
