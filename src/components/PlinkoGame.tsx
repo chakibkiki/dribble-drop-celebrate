@@ -119,8 +119,8 @@ export default function PlinkoGame({
       render: {
         sprite: {
           texture: ballImg,
-          xScale: (ballRadius * 2) / 1024,
-          yScale: (ballRadius * 2) / 1024,
+          xScale: (ballRadius * 2) / 512,
+          yScale: (ballRadius * 2) / 512,
         },
       },
     });
