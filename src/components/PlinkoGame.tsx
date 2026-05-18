@@ -207,11 +207,11 @@ export default function PlinkoGame({
         />
 
         {/* Labels slots */}
-        <div className="absolute bottom-0 left-0 right-0 grid grid-cols-5 z-20 pointer-events-none">
+        <div className="absolute bottom-0 left-0 right-0 grid grid-cols-5 z-20 pointer-events-none gap-1 px-1 pb-1">
           {SLOT_LABELS.map((l, i) => {
             const isGoal = i === 2;
             const isYellow = i === 0 || i === 4;
-            const base = isGoal
+            const outer = isGoal
               ? "bg-[#1e9d4a] text-white"
               : isYellow
               ? "bg-[#ffd400] text-[#e30613]"
@@ -219,9 +219,10 @@ export default function PlinkoGame({
             return (
               <div
                 key={i}
-                className={`text-center py-2 text-[11px] font-extrabold uppercase border-t-2 border-white ${base}`}
+                className={`aspect-square rounded-md flex flex-col items-center p-1 ${outer}`}
               >
-                {l}
+                <span className="text-[11px] font-extrabold uppercase leading-tight pt-0.5">{l}</span>
+                <div className="flex-1 w-full mt-1 rounded-md bg-gradient-to-b from-green-700 to-green-900" />
               </div>
             );
           })}
