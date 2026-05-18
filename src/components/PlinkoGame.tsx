@@ -187,8 +187,7 @@ export default function PlinkoGame({
         style={{
           width: 420,
           maxWidth: "100%",
-          backgroundImage:
-            "repeating-linear-gradient(0deg, #6fa14d 0px, #6fa14d 60px, #649f46 60px, #649f46 120px)",
+          backgroundColor: "#649f46",
         }}
       >
         {/* Lignes terrain */}
@@ -198,11 +197,6 @@ export default function PlinkoGame({
           <div className="absolute inset-y-0 right-1 w-0.5 bg-white/70" />
           <div className="absolute inset-x-0 top-1 h-0.5 bg-white/70" />
           <div className="absolute inset-x-0 bottom-1 h-0.5 bg-white/70" />
-          {/* Corners */}
-          <div className="absolute top-1 left-1 w-4 h-4 border-t-2 border-l-2 border-white/70 rounded-tl-full" />
-          <div className="absolute top-1 right-1 w-4 h-4 border-t-2 border-r-2 border-white/70 rounded-tr-full" />
-          <div className="absolute bottom-1 left-1 w-4 h-4 border-b-2 border-l-2 border-white/70 rounded-bl-full" />
-          <div className="absolute bottom-1 right-1 w-4 h-4 border-b-2 border-r-2 border-white/70 rounded-br-full" />
           <img
             src={isisLogo}
             alt="ISIS"
