@@ -11,6 +11,7 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
   const [distributed, setDistributed] = useState<Record<string, number>>({});
   const [totalAttempts, setTotalAttempts] = useState(0);
   const [closing, setClosing] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const refresh = async () => {
     const { data: s } = await supabase.from("animator_sessions").select("*").eq("id", sessionId).maybeSingle();
@@ -86,6 +87,30 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
     onClosed();
   };
 
+  const exportStockCsv = async () => {
+    if (!session) return;
+    setExporting(true);
+    const cfg = QUOTAS[session.store_type];
+    const header = ["Palier", "Cadeau", "Quota initial", "Distribué", "Restant"];
+    const lines = [header.join(";")];
+    Object.values(GIFTS).forEach((g) => {
+      const init = cfg.stocks[g.key] ?? 0;
+      const used = distributed[g.key] ?? 0;
+      lines.push([`P${g.tier}`, g.label, init, used, init - used].join(";"));
+    });
+    lines.push("");
+    lines.push(["", "TOTAL", cfg.total, totalAttempts, cfg.total - totalAttempts].join(";"));
+    const csv = "\uFEFF" + lines.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Stock_${session.store_name.replace(/[^a-z0-9]/gi, "_")}_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setExporting(false);
+  };
+
   if (!session) return <div className="min-h-screen flex items-center justify-center text-foreground">Chargement…</div>;
 
   const cfg = QUOTAS[session.store_type];
@@ -105,23 +130,12 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
           <Stat label="Quota total" value={cfg.total} />
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-4 space-y-2">
-          <h3 className="font-bold mb-2">Stock par cadeau</h3>
-          {Object.values(GIFTS).map((g) => {
-            const init = cfg.stocks[g.key];
-            const used = distributed[g.key] ?? 0;
-            const left = init - used;
-            return (
-              <div key={g.key} className="flex justify-between text-sm">
-                <span className="text-muted-foreground">P{g.tier} · {g.label}</span>
-                <span className={left === 0 ? "text-destructive font-bold" : "text-foreground font-semibold"}>{left} / {init}</span>
-              </div>
-            );
-          })}
-        </div>
-
         <button onClick={onPlay} disabled={remaining <= 0} className="w-full py-4 rounded-2xl bg-gradient-gold text-accent-foreground text-lg font-bold uppercase glow-gold disabled:opacity-40">
           {remaining <= 0 ? "Quota atteint" : "🎮 Nouveau participant"}
+        </button>
+
+        <button onClick={exportStockCsv} disabled={exporting} className="w-full py-3 rounded-2xl bg-secondary text-secondary-foreground border border-border font-semibold uppercase text-sm disabled:opacity-50">
+          {exporting ? "Export…" : "📥 Exporter la feuille des stocks (CSV)"}
         </button>
 
         <button onClick={closeDay} disabled={closing} className="w-full py-3 rounded-2xl bg-destructive text-destructive-foreground font-bold uppercase disabled:opacity-50">
