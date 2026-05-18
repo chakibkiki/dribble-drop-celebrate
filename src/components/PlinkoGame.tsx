@@ -33,7 +33,7 @@ export default function PlinkoGame({
     canvas.height = H;
 
     const engine = Matter.Engine.create();
-    engine.gravity.y = 1;
+    engine.gravity.y = 0.55;
     engineRef.current = engine;
 
     const render = Matter.Render.create({
@@ -111,16 +111,16 @@ export default function PlinkoGame({
     const slotW = W / 5;
     const targetX = slotW * targetSlot + slotW / 2;
 
-    const ballRadius = 18;
+    const ballRadius = 20;
     const ball = Matter.Bodies.circle(W / 2 + (Math.random() - 0.5) * 30, 30, ballRadius, {
-      restitution: 0.35,
-      friction: 0.05,
+      restitution: 0.3,
+      friction: 0.06,
       density: 0.003,
       render: {
         sprite: {
           texture: ballImg,
-          xScale: (ballRadius * 2) / 256,
-          yScale: (ballRadius * 2) / 256,
+          xScale: (ballRadius * 2) / 1024,
+          yScale: (ballRadius * 2) / 1024,
         },
       },
     });
