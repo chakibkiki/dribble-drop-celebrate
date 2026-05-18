@@ -1,16 +1,16 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import { GIFTS } from "@/lib/quotaConfig";
-import bg1 from "@/assets/win-bg-1.jpg";
-import bg2 from "@/assets/win-bg-2.jpg";
-import bg3 from "@/assets/win-bg-3.jpg";
+import bgP1 from "@/assets/palier1-boudaoui.png";
+import bgP2 from "@/assets/palier2-mandi.png";
+import bgP3 from "@/assets/palier3-bensebaini.png";
 
-const BACKGROUNDS = [bg1, bg2, bg3];
+const TIER_BG: Record<1 | 2 | 3, string> = { 1: bgP1, 2: bgP2, 3: bgP3 };
 
 export default function PrizeReveal({ tier, giftKey, giftLabel, onContinue }: { tier: 1 | 2 | 3; giftKey: string; giftLabel: string; onContinue: () => void }) {
   const gift = GIFTS[giftKey];
   const fired = useRef(false);
-  const bg = useMemo(() => BACKGROUNDS[Math.floor(Math.random() * BACKGROUNDS.length)], []);
+  const bg = TIER_BG[tier];
 
   useEffect(() => {
     if (fired.current) return;
