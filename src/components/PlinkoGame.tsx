@@ -215,7 +215,7 @@ export default function PlinkoGame({
               ? "bg-[#1e9d4a] text-white"
               : isYellow
               ? "bg-[#ffd400] text-[#e30613]"
-              : "bg-white text-[#e30613]";
+              : "bg-[#e30613] text-white";
             return (
               <div
                 key={i}
