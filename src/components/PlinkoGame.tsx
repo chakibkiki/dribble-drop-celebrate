@@ -103,6 +103,25 @@ export default function PlinkoGame({
       }
     }
 
+    // 4 clous Nord / Sud / Est / Ouest autour du logo central
+    const ringR = 80; // rayon du cercle central (w-40 = 160px)
+    const cardinals = [
+      { x: W / 2, y: H / 2 - ringR },
+      { x: W / 2, y: H / 2 + ringR },
+      { x: W / 2 + ringR, y: H / 2 },
+      { x: W / 2 - ringR, y: H / 2 },
+    ];
+    cardinals.forEach((p) =>
+      Matter.Composite.add(
+        engine.world,
+        Matter.Bodies.circle(p.x, p.y, pegRadius, {
+          isStatic: true,
+          render: { fillStyle: "#ffffff" },
+          restitution: 0.4,
+        }),
+      ),
+    );
+
     // 5 séparateurs slots
     const slotsCount = 5;
     const slotW = W / slotsCount;
