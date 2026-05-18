@@ -33,7 +33,11 @@ export default function PlinkoGame({
     canvas.height = H;
 
     const engine = Matter.Engine.create();
-    engine.gravity.y = 0.55;
+    engine.gravity.y = 0.5;
+    // Plus d'itérations = collisions plus précises et rebonds plus fluides
+    engine.positionIterations = 10;
+    engine.velocityIterations = 10;
+    engine.constraintIterations = 4;
     engineRef.current = engine;
 
     const render = Matter.Render.create({
@@ -49,7 +53,13 @@ export default function PlinkoGame({
     });
 
     // Murs
-    const wallStyle = { isStatic: true, render: { fillStyle: "transparent" } };
+    const wallStyle = {
+      isStatic: true,
+      restitution: 0.2,
+      friction: 0.02,
+      slop: 0.01,
+      render: { fillStyle: "transparent" },
+    };
     Matter.Composite.add(engine.world, [
       Matter.Bodies.rectangle(W / 2, H + 20, W, 40, wallStyle),
       Matter.Bodies.rectangle(-10, H / 2, 20, H, wallStyle),
@@ -97,7 +107,9 @@ export default function PlinkoGame({
           Matter.Bodies.circle(px, py, pegRadius, {
             isStatic: true,
             render: { fillStyle: "#ffffff" },
-            restitution: 0.4,
+            restitution: 0.65,
+            friction: 0.02,
+            slop: 0.01,
           }),
         );
       }
@@ -113,6 +125,9 @@ export default function PlinkoGame({
         engine.world,
         Matter.Bodies.rectangle(i * slotW, slotTop + 55, 4, 110, {
           isStatic: true,
+          restitution: 0.2,
+          friction: 0.02,
+          slop: 0.01,
           render: { fillStyle: "#ffffff" },
         }),
       );
@@ -139,10 +154,12 @@ export default function PlinkoGame({
 
     const ballRadius = 20;
     const ball = Matter.Bodies.circle(W / 2 + (Math.random() - 0.5) * 30, 30, ballRadius, {
-      restitution: 0.35,
-      friction: 0.05,
-      frictionAir: 0.012,
-      density: 0.004,
+      restitution: 0.55,
+      friction: 0.015,
+      frictionStatic: 0.05,
+      frictionAir: 0.008,
+      density: 0.005,
+      slop: 0.01,
       render: {
         sprite: {
           texture: ballImg,
