@@ -188,7 +188,7 @@ export default function PlinkoGame({
           width: 420,
           maxWidth: "100%",
           backgroundImage:
-            "repeating-linear-gradient(0deg, #1f8a3a 0px, #1f8a3a 60px, #15732e 60px, #15732e 120px)",
+            "repeating-linear-gradient(0deg, #6fa14d 0px, #6fa14d 60px, #649f46 60px, #649f46 120px)",
         }}
       >
         {/* Lignes terrain */}
@@ -229,10 +229,7 @@ export default function PlinkoGame({
                 <span className="text-[11px] font-extrabold uppercase leading-tight pt-0.5">{l}</span>
                 <div
                   className="flex-1 w-full mt-1 rounded-md"
-                  style={{
-                    backgroundImage:
-                      "repeating-linear-gradient(0deg, #1f8a3a 0px, #1f8a3a 14px, #15732e 14px, #15732e 28px)",
-                  }}
+                  style={{ backgroundColor: "#5d9a45" }}
                 />
               </div>
             );
