@@ -63,8 +63,8 @@ export default function PlinkoGame({
     const rowGap = (endY - startY) / (rows - 1);
     const pegRadius = 7;
     for (let r = 0; r < rows; r++) {
-      const cols = r % 2 === 0 ? 7 : 6;
-      const colGap = W / 7;
+      const cols = r % 2 === 0 ? 5 : 4;
+      const colGap = W / 5;
       const offset = r % 2 === 0 ? colGap / 2 : colGap;
       for (let c = 0; c < cols; c++) {
         Matter.Composite.add(
