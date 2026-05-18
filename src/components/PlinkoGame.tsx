@@ -160,9 +160,9 @@ export default function PlinkoGame({
   };
 
   return (
-    <div className="min-h-screen bg-primary flex flex-col items-center p-3 overflow-hidden">
+    <div className="min-h-screen bg-[#e30613] flex flex-col items-center p-3 overflow-hidden">
       <div className="w-full max-w-md flex justify-between items-center mb-2">
-        <button onClick={onBack} className="text-primary-foreground/80 text-sm">
+        <button onClick={onBack} className="text-white/80 text-sm">
           ← Retour
         </button>
         <span className="w-12" />
@@ -177,11 +177,11 @@ export default function PlinkoGame({
           <img
             src={isisLogo}
             alt="ISIS"
-            className="absolute top-6 left-1/2 -translate-x-1/2 h-24 object-contain z-10 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
+            className="absolute top-6 left-1/2 -translate-x-1/2 h-24 object-contain z-20 drop-shadow-[0_0_18px_rgba(255,255,255,0.9)]"
           />
           <div className="absolute top-1/2 left-0 right-0 border-t-2 border-white/40" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-44 flex items-center justify-center z-10">
-            <img src={fafLogo} alt="FAF" className="w-44 h-44 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 flex items-center justify-center z-20">
+            <img src={fafLogo} alt="FAF" className="w-40 h-40 object-contain drop-shadow-[0_0_16px_rgba(255,255,255,0.7)]" />
           </div>
           <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-40 h-20 border-2 border-white/40 border-b-0" />
         </div>
@@ -194,14 +194,23 @@ export default function PlinkoGame({
 
         {/* Labels slots */}
         <div className="absolute bottom-0 left-0 right-0 grid grid-cols-5 z-20 pointer-events-none">
-          {SLOT_LABELS.map((l, i) => (
-            <div
-              key={i}
-              className={`text-center py-2 text-xs font-bold uppercase border-t-2 ${i === 2 ? "bg-success text-white border-white" : i === 0 || i === 4 ? "bg-accent text-accent-foreground border-white" : "bg-primary text-primary-foreground border-white"}`}
-            >
-              {l}
-            </div>
-          ))}
+          {SLOT_LABELS.map((l, i) => {
+            const isGoal = i === 2;
+            const isYellow = i === 0 || i === 4;
+            const base = isGoal
+              ? "bg-[#1e9d4a] text-white"
+              : isYellow
+              ? "bg-[#ffd400] text-[#e30613]"
+              : "bg-white text-[#e30613]";
+            return (
+              <div
+                key={i}
+                className={`text-center py-2 text-[11px] font-extrabold uppercase border-t-2 border-white ${base}`}
+              >
+                {l}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -213,7 +222,7 @@ export default function PlinkoGame({
           🏆 Lâcher le ballon
         </button>
       )}
-      {dropped && !done && <p className="mt-4 text-primary-foreground font-bold animate-pulse-glow">⚽ En cours…</p>}
+      {dropped && !done && <p className="mt-4 text-white font-bold animate-pulse-glow">⚽ En cours…</p>}
     </div>
   );
 }
