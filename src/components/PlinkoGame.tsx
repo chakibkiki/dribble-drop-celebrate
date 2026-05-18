@@ -62,14 +62,32 @@ export default function PlinkoGame({
     const endY = H - 160;
     const rowGap = (endY - startY) / (rows - 1);
     const pegRadius = 7;
+    // Zones à protéger pour que les logos restent visibles
+    // Logo ISIS : top-6 (24px) + h-24 (96px) => ~24..120
+    // Logo FAF : centré au milieu, 160x160 => ~280..440 verticalement, ~130..290 horizontalement
+    const isInLogoZone = (x: number, y: number) => {
+      const pad = pegRadius + 4;
+      // ISIS (haut)
+      if (y < 120 + pad && x > W / 2 - 60 && x < W / 2 + 60) return true;
+      // FAF (centre)
+      const cx = W / 2;
+      const cy = H / 2;
+      const dx = x - cx;
+      const dy = y - cy;
+      if (Math.sqrt(dx * dx + dy * dy) < 90 + pad) return true;
+      return false;
+    };
     for (let r = 0; r < rows; r++) {
       const cols = r % 2 === 0 ? 5 : 4;
       const colGap = W / 5;
       const offset = r % 2 === 0 ? colGap / 2 : colGap;
       for (let c = 0; c < cols; c++) {
+        const px = offset + c * colGap;
+        const py = startY + r * rowGap;
+        if (isInLogoZone(px, py)) continue;
         Matter.Composite.add(
           engine.world,
-          Matter.Bodies.circle(offset + c * colGap, startY + r * rowGap, pegRadius, {
+          Matter.Bodies.circle(px, py, pegRadius, {
             isStatic: true,
             render: { fillStyle: "#ffffff" },
             restitution: 0.4,
