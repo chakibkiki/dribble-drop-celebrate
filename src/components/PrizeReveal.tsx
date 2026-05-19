@@ -16,18 +16,24 @@ export default function PrizeReveal({ tier, giftKey, giftLabel, onContinue }: { 
     if (fired.current) return;
     fired.current = true;
     const colors = ["#ef4444", "#3b82f6", "#ffffff", "#22c55e", "#fbbf24"];
-    const burst = (origin: { x: number; y: number }) =>
-      confetti({ particleCount: 120, spread: 90, startVelocity: 55, origin, colors, scalar: 1.1 });
-    burst({ x: 0.2, y: 0.4 });
-    burst({ x: 0.8, y: 0.4 });
-    burst({ x: 0.5, y: 0.3 });
-
-    const end = Date.now() + 2500;
-    const interval = window.setInterval(() => {
-      if (Date.now() > end) return clearInterval(interval);
-      confetti({ particleCount: 40, spread: 70, origin: { x: Math.random(), y: Math.random() * 0.4 }, colors });
-    }, 250);
-    return () => clearInterval(interval);
+    let interval: number | undefined;
+    // Différé après le premier paint pour que le cadeau s'affiche instantanément (perf Android)
+    const raf = requestAnimationFrame(() => {
+      const burst = (origin: { x: number; y: number }) =>
+        confetti({ particleCount: 80, spread: 90, startVelocity: 55, origin, colors, scalar: 1 });
+      burst({ x: 0.2, y: 0.4 });
+      burst({ x: 0.8, y: 0.4 });
+      burst({ x: 0.5, y: 0.3 });
+      const end = Date.now() + 2000;
+      interval = window.setInterval(() => {
+        if (Date.now() > end) return clearInterval(interval);
+        confetti({ particleCount: 30, spread: 70, origin: { x: Math.random(), y: Math.random() * 0.4 }, colors });
+      }, 280);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      if (interval) clearInterval(interval);
+    };
   }, []);
 
   return (
