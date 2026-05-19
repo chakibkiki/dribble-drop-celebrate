@@ -165,7 +165,6 @@ export default function PlinkoGame({
     Matter.Composite.add(engineRef.current.world, ball);
 
     // Guidage naturel : très léger en haut, plus marqué près des slots
-    const slotW2 = W / 5;
     const slotTop = H - 110;
     const floorY = H - 30;
     let lockedToTarget = false;
