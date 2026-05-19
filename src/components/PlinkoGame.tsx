@@ -23,6 +23,10 @@ export default function PlinkoGame({
   const [dropped, setDropped] = useState(false);
   const [done, setDone] = useState(false);
   const [debug, setDebug] = useState({ speed: 0, vx: 0, vy: 0, y: 0, ticks: 0, stuck: 0, phase: "—", locked: false });
+  const logsRef = useRef<Array<{ run: number; t: number; phase: string; locked: boolean; x: number; y: number; vx: number; vy: number; speed: number; ticks: number; stuck: number; target: number }>>([]);
+  const runIdRef = useRef(0);
+  const runStartRef = useRef(0);
+  const [logCount, setLogCount] = useState(0);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -182,6 +186,9 @@ export default function PlinkoGame({
     let lastMoveCheck = { x: ball.position.x, y: ball.position.y, stillTicks: 0 };
     let stuckCount = 0;
     let phase = "chute";
+    runIdRef.current += 1;
+    runStartRef.current = performance.now();
+    const runId = runIdRef.current;
     const guide = setInterval(() => {
       if (!engineRef.current) return;
       const dx = targetX - ball.position.x;
@@ -242,6 +249,21 @@ export default function PlinkoGame({
         phase,
         locked: lockedToTarget,
       });
+      logsRef.current.push({
+        run: runId,
+        t: Math.round(performance.now() - runStartRef.current),
+        phase,
+        locked: lockedToTarget,
+        x: Math.round(ball.position.x * 10) / 10,
+        y: Math.round(y * 10) / 10,
+        vx: Math.round(ball.velocity.x * 100) / 100,
+        vy: Math.round(ball.velocity.y * 100) / 100,
+        speed: Math.round(speed * 100) / 100,
+        ticks: lastMoveCheck.stillTicks,
+        stuck: stuckCount,
+        target: targetSlot,
+      });
+      setLogCount(logsRef.current.length);
     }, 20);
 
     let finished = false;
