@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { localStore } from "@/lib/localStore";
 import introImg from "@/assets/intro.png";
 
 const schema = z.object({
@@ -31,22 +31,19 @@ export default function ParticipantForm({
       return;
     }
     setLoading(true);
-    const { data, error } = await supabase
-      .from("participants")
-      .insert({
+    try {
+      const p = localStore.createParticipant({
         session_id: sessionId,
         full_name: parsed.data.full_name,
         age: parsed.data.age,
         phone: parsed.data.phone || null,
-      })
-      .select("id")
-      .single();
-    setLoading(false);
-    if (error || !data) {
+      });
+      setLoading(false);
+      onReady(p.id);
+    } catch {
+      setLoading(false);
       setErr("Erreur d'enregistrement");
-      return;
     }
-    onReady(data.id);
   };
 
   const pill =

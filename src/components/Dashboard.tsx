@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { QUOTAS, STORE_TYPE_LABEL, type StoreType, GIFTS } from "@/lib/quotaConfig";
 import { sessionStore } from "@/lib/sessionStore";
+import { localStore } from "@/lib/localStore";
 import * as XLSX from "xlsx";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
@@ -15,13 +15,12 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
   const [closing, setClosing] = useState(false);
 
   const refresh = async () => {
-    const { data: s } = await supabase.from("animator_sessions").select("*").eq("id", sessionId).maybeSingle();
+    const s = localStore.getSession(sessionId);
     if (s) setSession(s as Session);
-    const { data: prizes } = await supabase.from("prize_distributions").select("gift_key").eq("session_id", sessionId);
-    const counts: Record<string, number> = {};
-    (prizes ?? []).forEach((p) => { counts[p.gift_key] = (counts[p.gift_key] ?? 0) + 1; });
+    const prizes = localStore.listPrizes(sessionId);
+    const counts = localStore.giftCounts(sessionId);
     setDistributed(counts);
-    setTotalAttempts((prizes ?? []).length);
+    setTotalAttempts(prizes.length);
   };
 
   useEffect(() => { refresh(); }, [sessionId]);
@@ -31,15 +30,15 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
     if (!confirm("Clôturer la journée et télécharger l'historique cumulatif ?")) return;
     setClosing(true);
 
-    const { data: participants } = await supabase.from("participants").select("*").eq("session_id", sessionId).order("created_at");
-    const { data: prizes } = await supabase.from("prize_distributions").select("*").eq("session_id", sessionId).order("attempt_number");
-    const partMap = new Map((participants ?? []).map((p: any) => [p.id, p]));
+    const participants = localStore.listParticipants(sessionId);
+    const prizes = localStore.listPrizes(sessionId);
+    const partMap = new Map(participants.map((p) => [p.id, p]));
 
     // === Construction de l'entrée du jour ===
     const dayKey = new Date(session.started_at).toISOString().slice(0, 10);
     const cfg = QUOTAS[session.store_type];
     const giftStats = Object.values(GIFTS).map((g) => {
-      const dist = (prizes ?? []).filter((p: any) => p.gift_key === g.key).length;
+      const dist = prizes.filter((p) => p.gift_key === g.key).length;
       const init = cfg.stocks[g.key] ?? 0;
       return { key: g.key, label: g.label, tier: g.tier, dist, init, rest: init - dist };
     });
@@ -51,9 +50,9 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
       wilaya: session.wilaya,
       store_name: session.store_name,
       store_type: session.store_type,
-      total: (prizes ?? []).length,
+      total: prizes.length,
       giftStats,
-      prizes: (prizes ?? []).map((p: any) => {
+      prizes: prizes.map((p) => {
         const part: any = partMap.get(p.participant_id);
         return {
           attempt: p.attempt_number,
@@ -65,7 +64,7 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
           gift: p.gift_label,
         };
       }),
-      participants: (participants ?? []).map((p: any) => ({
+      participants: participants.map((p) => ({
         time: p.created_at, name: p.full_name, age: p.age, phone: p.phone ?? "",
       })),
     };
@@ -143,7 +142,7 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
       XLSX.writeFile(wb, fname);
     }
 
-    await supabase.from("animator_sessions").update({ closed_at: new Date().toISOString() }).eq("id", sessionId);
+    localStore.closeSession(sessionId);
     sessionStore.clear();
     setClosing(false);
     onClosed();
