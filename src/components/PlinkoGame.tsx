@@ -264,8 +264,8 @@ export default function PlinkoGame({
           <img
             src={isisLogo}
             alt="ISIS"
-            className="absolute left-1/2 -translate-x-1/2 h-24 object-contain z-20 drop-shadow-[0_0_18px_rgba(255,255,255,0.9)]"
-            style={{ top: 114 }}
+            className="absolute left-1/2 -translate-x-1/2 h-20 object-contain z-20 drop-shadow-[0_0_18px_rgba(255,255,255,0.9)]"
+            style={{ top: 120 }}
           />
           <div className="absolute top-1/2 left-0 right-0 border-t-2 border-white/70" />
           {/* Rond central du terrain */}
