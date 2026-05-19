@@ -92,5 +92,5 @@ export function tierToSlot(tier: 1 | 2 | 3): number {
   return Math.random() < 0.5 ? 0 : 4;
 }
 
-export const SLOT_LABELS = ["Palier 02", "Palier 01", "GOAL!", "Palier 01", "Palier 02"];
+export const SLOT_LABELS = ["Carton Jaune", "Carton Rouge", "Carton Gold", "Carton Rouge", "Carton Jaune"];
 export const SLOT_COLORS: ("yellow" | "red" | "green")[] = ["yellow", "red", "green", "red", "yellow"];

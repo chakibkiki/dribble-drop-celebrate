@@ -13,7 +13,6 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
   const [distributed, setDistributed] = useState<Record<string, number>>({});
   const [totalAttempts, setTotalAttempts] = useState(0);
   const [closing, setClosing] = useState(false);
-  const [exporting, setExporting] = useState(false);
 
   const refresh = async () => {
     const { data: s } = await supabase.from("animator_sessions").select("*").eq("id", sessionId).maybeSingle();
@@ -150,30 +149,6 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
     onClosed();
   };
 
-  const exportStockCsv = async () => {
-    if (!session) return;
-    setExporting(true);
-    const cfg = QUOTAS[session.store_type];
-    const header = ["Palier", "Cadeau", "Quota initial", "Distribué", "Restant"];
-    const lines = [header.join(";")];
-    Object.values(GIFTS).forEach((g) => {
-      const init = cfg.stocks[g.key] ?? 0;
-      const used = distributed[g.key] ?? 0;
-      lines.push([`P${g.tier}`, g.label, init, used, init - used].join(";"));
-    });
-    lines.push("");
-    lines.push(["", "TOTAL", cfg.total, totalAttempts, cfg.total - totalAttempts].join(";"));
-    const csv = "\uFEFF" + lines.join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Stock_${session.store_name.replace(/[^a-z0-9]/gi, "_")}_${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setExporting(false);
-  };
-
   if (!session) return <div className="min-h-screen flex items-center justify-center text-foreground">Chargement…</div>;
 
   const cfg = QUOTAS[session.store_type];
@@ -197,13 +172,11 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
           {remaining <= 0 ? "Quota atteint" : "🎮 Nouveau participant"}
         </button>
 
-        <button onClick={exportStockCsv} disabled={exporting} className="w-full py-3 rounded-2xl bg-secondary text-secondary-foreground border border-border font-semibold uppercase text-sm disabled:opacity-50">
-          {exporting ? "Export…" : "📥 Exporter la feuille des stocks (CSV)"}
-        </button>
-
-        <button onClick={closeDay} disabled={closing} className="w-full py-3 rounded-2xl bg-destructive text-destructive-foreground font-bold uppercase disabled:opacity-50">
-          {closing ? "Génération…" : "📊 Clôturer & Exporter Excel"}
-        </button>
+        <div className="pt-24">
+          <button onClick={closeDay} disabled={closing} className="w-full py-3 rounded-2xl bg-destructive text-destructive-foreground font-bold uppercase disabled:opacity-50">
+            {closing ? "Génération…" : "📊 Clôturer & Exporter Excel"}
+          </button>
+        </div>
       </div>
     </div>
   );
