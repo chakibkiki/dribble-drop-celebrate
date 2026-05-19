@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { sessionStore } from "@/lib/sessionStore";
+import { localStore } from "@/lib/localStore";
 import { computeRemainingStock, pickGift, tierToSlot } from "@/lib/giftAlgorithm";
 import type { StoreType } from "@/lib/quotaConfig";
 import AnimatorSetup from "@/components/AnimatorSetup";
@@ -21,18 +21,16 @@ const Index = () => {
 
   // Au démarrage : vérifier la session locale
   useEffect(() => {
-    (async () => {
-      const id = sessionStore.get();
-      if (!id) { setStage("setup"); return; }
-      const { data } = await supabase.from("animator_sessions").select("id, closed_at").eq("id", id).maybeSingle();
-      if (!data || data.closed_at) {
-        sessionStore.clear();
-        setStage("setup");
-      } else {
-        setSessionId(id);
-        setStage("dashboard");
-      }
-    })();
+    const id = sessionStore.get();
+    if (!id) { setStage("setup"); return; }
+    const s = localStore.getSession(id);
+    if (!s || s.closed_at) {
+      sessionStore.clear();
+      setStage("setup");
+    } else {
+      setSessionId(id);
+      setStage("dashboard");
+    }
   }, []);
 
   const startNewParticipant = () => setStage("form");
@@ -41,14 +39,11 @@ const Index = () => {
     if (!sessionId) return;
     setParticipantId(pid);
 
-    // Récupère type magasin + cadeaux distribués
-    const { data: s } = await supabase.from("animator_sessions").select("store_type").eq("id", sessionId).maybeSingle();
+    const s = localStore.getSession(sessionId);
     const storeType = (s?.store_type ?? "top_mt") as StoreType;
-    const { data: prizes } = await supabase.from("prize_distributions").select("gift_key").eq("session_id", sessionId);
-    const counts: Record<string, number> = {};
-    (prizes ?? []).forEach((p: any) => { counts[p.gift_key] = (counts[p.gift_key] ?? 0) + 1; });
+    const counts = localStore.giftCounts(sessionId);
     const remaining = computeRemainingStock(storeType, counts);
-    const attemptNumber = (prizes ?? []).length + 1;
+    const attemptNumber = localStore.countPrizes(sessionId) + 1;
     const gift = pickGift(storeType, attemptNumber, remaining);
     if (!gift) {
       alert("Stock épuisé !");
@@ -62,25 +57,22 @@ const Index = () => {
 
   const onBallSettled = async () => {
     if (!sessionId || !participantId || !pendingPrize) return;
-    // Affiche immédiatement la révélation pour éviter la latence sur mobile
     const prize = pendingPrize;
     const pid = participantId;
     setRevealed({ tier: prize.tier, label: prize.label, key: prize.key });
     setPendingPrize(null);
     setParticipantId(null);
     setStage("reveal");
-    // Persistance en arrière-plan
-    (async () => {
-      const { count } = await supabase.from("prize_distributions").select("*", { count: "exact", head: true }).eq("session_id", sessionId);
-      await supabase.from("prize_distributions").insert({
-        session_id: sessionId,
-        participant_id: pid,
-        tier: prize.tier,
-        gift_key: prize.key,
-        gift_label: prize.label,
-        attempt_number: (count ?? 0) + 1,
-      });
-    })();
+    // Persistance locale (synchrone, ultra rapide)
+    const attemptNumber = localStore.countPrizes(sessionId) + 1;
+    localStore.createPrize({
+      session_id: sessionId,
+      participant_id: pid,
+      tier: prize.tier,
+      gift_key: prize.key,
+      gift_label: prize.label,
+      attempt_number: attemptNumber,
+    });
   };
 
   if (stage === "loading") return <div className="min-h-screen flex items-center justify-center bg-background text-foreground">Chargement…</div>;
