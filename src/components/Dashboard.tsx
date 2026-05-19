@@ -124,7 +124,25 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
     });
 
     const fname = `Historique_Stocks_${session.store_name.replace(/[^a-z0-9]/gi, "_")}.xlsx`;
-    XLSX.writeFile(wb, fname);
+    if (Capacitor.isNativePlatform()) {
+      // App native : écriture directe dans Documents/PlinkoISIS (écrase à chaque clôture)
+      const b64 = XLSX.write(wb, { type: "base64", bookType: "xlsx" });
+      const folder = "PlinkoISIS";
+      try {
+        await Filesystem.mkdir({ path: folder, directory: Directory.Documents, recursive: true });
+      } catch { /* dossier déjà existant */ }
+      const res = await Filesystem.writeFile({
+        path: `${folder}/${fname}`,
+        data: b64,
+        directory: Directory.Documents,
+        encoding: undefined as unknown as Encoding, // base64 binaire
+        recursive: true,
+      });
+      alert(`Historique enregistré sur la tablette :\n${res.uri}`);
+    } else {
+      // Navigateur web : téléchargement classique
+      XLSX.writeFile(wb, fname);
+    }
 
     await supabase.from("animator_sessions").update({ closed_at: new Date().toISOString() }).eq("id", sessionId);
     sessionStore.clear();
