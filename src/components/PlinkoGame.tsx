@@ -22,6 +22,7 @@ export default function PlinkoGame({
   const engineRef = useRef<Matter.Engine | null>(null);
   const [dropped, setDropped] = useState(false);
   const [done, setDone] = useState(false);
+  const [debug, setDebug] = useState({ speed: 0, vx: 0, vy: 0, y: 0, ticks: 0, stuck: 0, phase: "—", locked: false });
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -179,6 +180,8 @@ export default function PlinkoGame({
     const captureY = slotTop - 68;
     let lockedToTarget = false;
     let lastMoveCheck = { x: ball.position.x, y: ball.position.y, stillTicks: 0 };
+    let stuckCount = 0;
+    let phase = "chute";
     const guide = setInterval(() => {
       if (!engineRef.current) return;
       const dx = targetX - ball.position.x;
@@ -198,17 +201,20 @@ export default function PlinkoGame({
           y: 3.2,
         });
         lastMoveCheck.stillTicks = 0;
+        stuckCount += 1;
       }
 
       if (y < slotTop - 180) {
         // Phase 1 : chute presque libre, biais imperceptible
         const force = (dx / W) * 0.0008 * ball.mass;
         Matter.Body.applyForce(ball, ball.position, { x: force, y: 0 });
+        phase = "1·chute";
       } else if (y < captureY) {
         // Phase 2 : approche — on règle directement la vitesse horizontale
         // pour amener le ballon dans la bonne colonne avant l'entrée du palier
         const desiredVx = Math.max(-6, Math.min(6, dx * 0.08));
         Matter.Body.setVelocity(ball, { x: desiredVx, y: ball.velocity.y });
+        phase = "2·approche";
       } else {
         // Phase 3 : couloir final — le ballon est capturé dans sa colonne cible
         // avant les séparateurs, donc il ne peut plus sauter vers un autre palier.
@@ -224,7 +230,18 @@ export default function PlinkoGame({
           x: Math.max(-1.2, Math.min(1.2, dx * 0.02)),
           y: Math.max(3.5, Math.min(6.5, ball.velocity.y || 4)),
         });
+        phase = "3·lock";
       }
+      setDebug({
+        speed: Math.round(speed * 100) / 100,
+        vx: Math.round(ball.velocity.x * 100) / 100,
+        vy: Math.round(ball.velocity.y * 100) / 100,
+        y: Math.round(y),
+        ticks: lastMoveCheck.stillTicks,
+        stuck: stuckCount,
+        phase,
+        locked: lockedToTarget,
+      });
     }, 20);
 
     let finished = false;
@@ -342,6 +359,18 @@ export default function PlinkoGame({
         </button>
       )}
       {dropped && !done && <p className="mt-4 text-white font-bold animate-pulse-glow">⚽ En cours…</p>}
+      {dropped && (
+        <div className="mt-3 w-full max-w-md rounded-lg bg-black/70 text-white font-mono text-[11px] px-3 py-2 grid grid-cols-2 gap-x-4 gap-y-1">
+          <span>phase: <b>{debug.phase}</b></span>
+          <span>lock: <b>{debug.locked ? "oui" : "non"}</b></span>
+          <span>speed: <b>{debug.speed}</b></span>
+          <span>y: <b>{debug.y}</b></span>
+          <span>vx: <b>{debug.vx}</b></span>
+          <span>vy: <b>{debug.vy}</b></span>
+          <span>still ticks: <b className={debug.ticks >= 5 ? "text-yellow-300" : ""}>{debug.ticks}</b></span>
+          <span>déblocages: <b className={debug.stuck > 0 ? "text-red-400" : ""}>{debug.stuck}</b></span>
+        </div>
+      )}
     </div>
   );
 }
