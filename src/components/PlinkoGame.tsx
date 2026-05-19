@@ -23,6 +23,10 @@ export default function PlinkoGame({
   const [dropped, setDropped] = useState(false);
   const [done, setDone] = useState(false);
   const [debug, setDebug] = useState({ speed: 0, vx: 0, vy: 0, y: 0, ticks: 0, stuck: 0, phase: "—", locked: false });
+  const logsRef = useRef<Array<{ run: number; t: number; phase: string; locked: boolean; x: number; y: number; vx: number; vy: number; speed: number; ticks: number; stuck: number; target: number }>>([]);
+  const runIdRef = useRef(0);
+  const runStartRef = useRef(0);
+  const [logCount, setLogCount] = useState(0);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -182,6 +186,9 @@ export default function PlinkoGame({
     let lastMoveCheck = { x: ball.position.x, y: ball.position.y, stillTicks: 0 };
     let stuckCount = 0;
     let phase = "chute";
+    runIdRef.current += 1;
+    runStartRef.current = performance.now();
+    const runId = runIdRef.current;
     const guide = setInterval(() => {
       if (!engineRef.current) return;
       const dx = targetX - ball.position.x;
@@ -242,6 +249,21 @@ export default function PlinkoGame({
         phase,
         locked: lockedToTarget,
       });
+      logsRef.current.push({
+        run: runId,
+        t: Math.round(performance.now() - runStartRef.current),
+        phase,
+        locked: lockedToTarget,
+        x: Math.round(ball.position.x * 10) / 10,
+        y: Math.round(y * 10) / 10,
+        vx: Math.round(ball.velocity.x * 100) / 100,
+        vy: Math.round(ball.velocity.y * 100) / 100,
+        speed: Math.round(speed * 100) / 100,
+        ticks: lastMoveCheck.stillTicks,
+        stuck: stuckCount,
+        target: targetSlot,
+      });
+      setLogCount(logsRef.current.length);
     }, 20);
 
     let finished = false;
@@ -371,6 +393,40 @@ export default function PlinkoGame({
           <span>déblocages: <b className={debug.stuck > 0 ? "text-red-400" : ""}>{debug.stuck}</b></span>
         </div>
       )}
+      <div className="mt-2 w-full max-w-md flex items-center justify-between gap-2">
+        <span className="text-white/80 text-[11px] font-mono">logs: {logCount} échantillons · essais: {runIdRef.current}</span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              const rows = logsRef.current;
+              if (!rows.length) return;
+              const header = ["run", "t_ms", "phase", "locked", "x", "y", "vx", "vy", "speed", "still_ticks", "stuck_count", "target"];
+              const csv = [header.join(",")].concat(
+                rows.map((r) => [r.run, r.t, r.phase, r.locked ? 1 : 0, r.x, r.y, r.vx, r.vy, r.speed, r.ticks, r.stuck, r.target].join(",")),
+              ).join("\n");
+              const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `plinko-debug-${new Date().toISOString().replace(/[:.]/g, "-")}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            className="px-3 py-1 rounded bg-white text-[#e30613] text-[11px] font-bold uppercase"
+          >
+            Export CSV
+          </button>
+          <button
+            onClick={() => {
+              logsRef.current = [];
+              setLogCount(0);
+            }}
+            className="px-3 py-1 rounded bg-black/50 text-white text-[11px] font-bold uppercase border border-white/30"
+          >
+            Vider
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
