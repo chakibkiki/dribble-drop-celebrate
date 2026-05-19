@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.7763c2dc97984c6d92f539d829f93d3b',
+  appId: 'app.lovable.plinkoisis',
   appName: 'Plinko ISIS',
   webDir: 'dist',
   server: {
