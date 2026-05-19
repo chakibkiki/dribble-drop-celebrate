@@ -109,9 +109,10 @@ export default function PlinkoGame({
           Matter.Bodies.circle(px, py, pegRadius, {
             isStatic: true,
             render: { fillStyle: "#ffffff" },
-            restitution: 0.65,
-            friction: 0.02,
-            slop: 0.01,
+            restitution: 0.45,
+            friction: 0,
+            frictionStatic: 0,
+            slop: 0.04,
           }),
         );
       }
@@ -156,12 +157,12 @@ export default function PlinkoGame({
 
     const ballRadius = 20;
     const ball = Matter.Bodies.circle(W / 2 + (Math.random() - 0.5) * 30, 30, ballRadius, {
-      restitution: 0.55,
-      friction: 0.015,
-      frictionStatic: 0.05,
-      frictionAir: 0.008,
+      restitution: 0.35,
+      friction: 0,
+      frictionStatic: 0,
+      frictionAir: 0.004,
       density: 0.005,
-      slop: 0.01,
+      slop: 0.04,
       render: {
         sprite: {
           texture: ballImg,
@@ -175,33 +176,53 @@ export default function PlinkoGame({
     // Guidage naturel : très léger en haut, plus marqué près des slots
     const slotTop = H - 110;
     const floorY = H - 30;
+    const captureY = slotTop - 68;
     let lockedToTarget = false;
+    let lastMoveCheck = { x: ball.position.x, y: ball.position.y, stillTicks: 0 };
     const guide = setInterval(() => {
       if (!engineRef.current) return;
       const dx = targetX - ball.position.x;
       const y = ball.position.y;
+      const speed = Math.hypot(ball.velocity.x, ball.velocity.y);
+
+      // Anti-blocage : si le ballon reste posé sur un clou, on le relance doucement vers le bas.
+      const moved = Math.hypot(ball.position.x - lastMoveCheck.x, ball.position.y - lastMoveCheck.y);
+      lastMoveCheck = {
+        x: ball.position.x,
+        y: ball.position.y,
+        stillTicks: moved < 1.2 && speed < 0.55 && y < captureY ? lastMoveCheck.stillTicks + 1 : 0,
+      };
+      if (lastMoveCheck.stillTicks >= 10) {
+        Matter.Body.setVelocity(ball, {
+          x: Math.max(-2.5, Math.min(2.5, dx * 0.02 || (Math.random() - 0.5) * 1.5)),
+          y: 3.8,
+        });
+        lastMoveCheck.stillTicks = 0;
+      }
 
       if (y < slotTop - 180) {
         // Phase 1 : chute presque libre, biais imperceptible
         const force = (dx / W) * 0.0008 * ball.mass;
         Matter.Body.applyForce(ball, ball.position, { x: force, y: 0 });
-      } else if (y < slotTop) {
+      } else if (y < captureY) {
         // Phase 2 : approche — on règle directement la vitesse horizontale
         // pour amener le ballon dans la bonne colonne avant l'entrée du palier
         const desiredVx = Math.max(-6, Math.min(6, dx * 0.08));
         Matter.Body.setVelocity(ball, { x: desiredVx, y: ball.velocity.y });
       } else {
-        // Phase 3 : dans le palier — glissement progressif vers targetX
-        // sans téléportation (évite de "sauter" par-dessus les séparateurs)
+        // Phase 3 : couloir final — le ballon est capturé dans sa colonne cible
+        // avant les séparateurs, donc il ne peut plus sauter vers un autre palier.
         lockedToTarget = true;
-        const step = Math.sign(dx) * Math.min(Math.abs(dx), 3);
+        const laneLeft = targetSlot * slotW + ballRadius + 6;
+        const laneRight = (targetSlot + 1) * slotW - ballRadius - 6;
+        const nextX = Math.max(laneLeft, Math.min(laneRight, ball.position.x + Math.sign(dx) * Math.min(Math.abs(dx), 4.5)));
         Matter.Body.setPosition(ball, {
-          x: ball.position.x + step,
+          x: nextX,
           y: ball.position.y,
         });
         Matter.Body.setVelocity(ball, {
-          x: 0,
-          y: Math.max(3, Math.min(7, ball.velocity.y || 4)),
+          x: Math.max(-1.2, Math.min(1.2, dx * 0.02)),
+          y: Math.max(3.5, Math.min(6.5, ball.velocity.y || 4)),
         });
       }
     }, 20);
