@@ -102,6 +102,8 @@ export default function PlinkoGame({
         const px = offset + c * colGap;
         const py = startY + r * rowGap;
         if (isInLogoZone(px, py)) continue;
+        // Évite les clous trop près des bords où le ballon peut se coincer
+        if (px < 30 || px > W - 30) continue;
         Matter.Composite.add(
           engine.world,
           Matter.Bodies.circle(px, py, pegRadius, {
