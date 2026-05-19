@@ -109,10 +109,10 @@ export default function PlinkoGame({
           Matter.Bodies.circle(px, py, pegRadius, {
             isStatic: true,
             render: { fillStyle: "#ffffff" },
-            restitution: 0.45,
+            restitution: 0.35,
             friction: 0,
             frictionStatic: 0,
-            slop: 0.04,
+            slop: 0.05,
           }),
         );
       }
@@ -157,12 +157,12 @@ export default function PlinkoGame({
 
     const ballRadius = 12;
     const ball = Matter.Bodies.circle(W / 2 + (Math.random() - 0.5) * 30, 30, ballRadius, {
-      restitution: 0.35,
+      restitution: 0.28,
       friction: 0,
       frictionStatic: 0,
-      frictionAir: 0.004,
-      density: 0.005,
-      slop: 0.04,
+      frictionAir: 0.012,
+      density: 0.008,
+      slop: 0.05,
       render: {
         sprite: {
           texture: ballImg,
@@ -190,12 +190,12 @@ export default function PlinkoGame({
       lastMoveCheck = {
         x: ball.position.x,
         y: ball.position.y,
-        stillTicks: moved < 1.2 && speed < 0.55 && y < captureY ? lastMoveCheck.stillTicks + 1 : 0,
+        stillTicks: moved < 0.8 && speed < 0.5 && y < captureY ? lastMoveCheck.stillTicks + 1 : 0,
       };
-      if (lastMoveCheck.stillTicks >= 10) {
+      if (lastMoveCheck.stillTicks >= 8) {
         Matter.Body.setVelocity(ball, {
-          x: Math.max(-2.5, Math.min(2.5, dx * 0.02 || (Math.random() - 0.5) * 1.5)),
-          y: 3.8,
+          x: Math.max(-2, Math.min(2, dx * 0.02 || (Math.random() - 0.5) * 1.8)),
+          y: 3.2,
         });
         lastMoveCheck.stillTicks = 0;
       }
