@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
 import { sessionStore } from "@/lib/sessionStore";
+import { localStore } from "@/lib/localStore";
 import { STORE_TYPE_LABEL, type StoreType } from "@/lib/quotaConfig";
 import introImg from "@/assets/intro.png";
 
@@ -31,14 +31,15 @@ export default function AnimatorSetup({ onReady }: { onReady: (id: string) => vo
       return;
     }
     setLoading(true);
-    const { data, error } = await supabase.from("animator_sessions").insert(parsed.data).select("id").single();
-    setLoading(false);
-    if (error || !data) {
+    try {
+      const s = localStore.createSession(parsed.data);
+      sessionStore.set(s.id);
+      setLoading(false);
+      onReady(s.id);
+    } catch {
+      setLoading(false);
       setErr("Erreur lors de la création de la session");
-      return;
     }
-    sessionStore.set(data.id);
-    onReady(data.id);
   };
 
   const pill =
