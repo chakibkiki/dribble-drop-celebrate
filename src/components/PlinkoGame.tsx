@@ -158,9 +158,10 @@ export default function PlinkoGame({
     // sans changer la vitesse perçue (le pas reste fixe pour la physique).
     const physicsDelta = lowEnd ? 1000 / 50 : 1000 / 60;
     const runner = Matter.Runner.create({
-      isFixed: true,
       delta: physicsDelta,
-    });
+      // pas fixe : empêche que les chutes de FPS accélèrent la physique
+      isFixed: true,
+    } as Matter.IRunnerOptions & { isFixed: boolean });
     Matter.Runner.run(runner, engine);
 
     return () => {
