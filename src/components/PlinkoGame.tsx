@@ -417,18 +417,6 @@ export default function PlinkoGame({
         </button>
       )}
       {dropped && !done && <p className="mt-4 text-white font-bold animate-pulse-glow">⚽ En cours…</p>}
-      {dropped && (
-        <div className="mt-3 w-full max-w-md rounded-lg bg-black/70 text-white font-mono text-[11px] px-3 py-2 grid grid-cols-2 gap-x-4 gap-y-1">
-          <span>phase: <b>{debug.phase}</b></span>
-          <span>lock: <b>{debug.locked ? "oui" : "non"}</b></span>
-          <span>speed: <b>{debug.speed}</b></span>
-          <span>y: <b>{debug.y}</b></span>
-          <span>vx: <b>{debug.vx}</b></span>
-          <span>vy: <b>{debug.vy}</b></span>
-          <span>still ticks: <b className={debug.ticks >= 5 ? "text-yellow-300" : ""}>{debug.ticks}</b></span>
-          <span>déblocages: <b className={debug.stuck > 0 ? "text-red-400" : ""}>{debug.stuck}</b></span>
-        </div>
-      )}
     </div>
   );
 }
