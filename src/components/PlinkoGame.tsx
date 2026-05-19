@@ -38,7 +38,8 @@ export default function PlinkoGame({
     canvas.height = H;
 
     const engine = Matter.Engine.create();
-    engine.gravity.y = 0.9;
+    // Gravité réduite pour une chute plus douce et lisible
+    engine.gravity.y = 0.55;
     // Plus d'itérations = collisions plus précises et rebonds plus fluides
     engine.positionIterations = 10;
     engine.velocityIterations = 10;
@@ -165,7 +166,8 @@ export default function PlinkoGame({
       restitution: 0.28,
       friction: 0,
       frictionStatic: 0,
-      frictionAir: 0.012,
+      // Plus d'air = vitesse terminale plus basse, chute plus posée
+      frictionAir: 0.022,
       density: 0.008,
       slop: 0.05,
       render: {
@@ -235,7 +237,7 @@ export default function PlinkoGame({
       } else if (y < captureY) {
         // Phase 2 : approche — on règle directement la vitesse horizontale
         // vers un passage décalé pour éviter de rester posé sur les derniers clous.
-        const desiredVx = clamp(guideDx * 0.075, -5.2, 5.2);
+        const desiredVx = clamp(guideDx * 0.06, -3.6, 3.6);
         Matter.Body.setVelocity(ball, { x: desiredVx, y: ball.velocity.y });
         phase = "2·approche";
       } else {
@@ -244,14 +246,14 @@ export default function PlinkoGame({
         lockedToTarget = true;
         const lockX = y < clearPegsY ? safeApproachX : targetX;
         const lockDx = lockX - ball.position.x;
-        const nextX = clamp(ball.position.x + Math.sign(lockDx) * Math.min(Math.abs(lockDx), 4.5), laneLeft, laneRight);
+        const nextX = clamp(ball.position.x + Math.sign(lockDx) * Math.min(Math.abs(lockDx), 3), laneLeft, laneRight);
         Matter.Body.setPosition(ball, {
           x: nextX,
           y: ball.position.y,
         });
         Matter.Body.setVelocity(ball, {
-          x: clamp(lockDx * 0.02, -1.2, 1.2),
-          y: Math.max(3.5, Math.min(6.5, ball.velocity.y || 4)),
+          x: clamp(lockDx * 0.02, -0.9, 0.9),
+          y: Math.max(2.4, Math.min(4.5, ball.velocity.y || 3)),
         });
         phase = "3·lock";
       }
