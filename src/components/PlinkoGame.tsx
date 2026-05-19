@@ -86,6 +86,12 @@ export default function PlinkoGame({
         x < W / 2 + isisHalfW
       )
         return true;
+      // FAF (logo central)
+      const cx = W / 2;
+      const cy = H / 2;
+      const dx = x - cx;
+      const dy = y - cy;
+      if (Math.sqrt(dx * dx + dy * dy) < 78 + pad) return true;
       return false;
     };
     for (let r = 0; r < rows; r++) {
