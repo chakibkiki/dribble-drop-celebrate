@@ -33,7 +33,7 @@ export default function PlinkoGame({
     canvas.height = H;
 
     const engine = Matter.Engine.create();
-    engine.gravity.y = 0.5;
+    engine.gravity.y = 0.9;
     // Plus d'itérations = collisions plus précises et rebonds plus fluides
     engine.positionIterations = 10;
     engine.velocityIterations = 10;
@@ -86,12 +86,6 @@ export default function PlinkoGame({
         x < W / 2 + isisHalfW
       )
         return true;
-      // FAF (centre)
-      const cx = W / 2;
-      const cy = H / 2;
-      const dx = x - cx;
-      const dy = y - cy;
-      if (Math.sqrt(dx * dx + dy * dy) < 90 + pad) return true;
       return false;
     };
     for (let r = 0; r < rows; r++) {
@@ -171,6 +165,7 @@ export default function PlinkoGame({
     Matter.Composite.add(engineRef.current.world, ball);
 
     // Guidage naturel : très léger en haut, plus marqué près des slots
+    const slotW2 = W / 5;
     const slotTop = H - 110;
     const floorY = H - 30;
     let lockedToTarget = false;
@@ -179,30 +174,28 @@ export default function PlinkoGame({
       const dx = targetX - ball.position.x;
       const y = ball.position.y;
 
-      if (y < slotTop - 120) {
-        // Phase 1 : chute libre quasi naturelle, micro-biais
-        const proximity = Math.max(0, (y - 120) / (slotTop - 240));
-        const force = (dx / W) * 0.0006 * proximity * ball.mass;
+      if (y < slotTop - 180) {
+        // Phase 1 : chute presque libre, biais imperceptible
+        const force = (dx / W) * 0.0008 * ball.mass;
         Matter.Body.applyForce(ball, ball.position, { x: force, y: 0 });
       } else if (y < slotTop) {
-        // Phase 2 : approche, on amène progressivement vers la colonne cible
-        const force = (dx / W) * 0.0035 * ball.mass;
-        Matter.Body.applyForce(ball, ball.position, { x: force, y: 0 });
+        // Phase 2 : approche — on règle directement la vitesse horizontale
+        // pour amener le ballon dans la bonne colonne avant l'entrée du palier
+        const desiredVx = Math.max(-6, Math.min(6, dx * 0.08));
+        Matter.Body.setVelocity(ball, { x: desiredVx, y: ball.velocity.y });
       } else {
-        // Phase 3 : entrée dans le palier — verrouille X, garde la vitesse Y
-        if (!lockedToTarget) {
-          lockedToTarget = true;
-          Matter.Body.setPosition(ball, { x: targetX, y });
-          Matter.Body.setVelocity(ball, {
-            x: 0,
-            y: Math.max(2.5, Math.min(6, ball.velocity.y)),
-          });
-        } else {
-          // Maintien doux sur la colonne cible (amortit les rebonds latéraux)
-          const corrected = ball.position.x + (targetX - ball.position.x) * 0.35;
-          Matter.Body.setPosition(ball, { x: corrected, y: ball.position.y });
-          Matter.Body.setVelocity(ball, { x: 0, y: ball.velocity.y });
-        }
+        // Phase 3 : dans le palier — glissement progressif vers targetX
+        // sans téléportation (évite de "sauter" par-dessus les séparateurs)
+        lockedToTarget = true;
+        const step = Math.sign(dx) * Math.min(Math.abs(dx), 3);
+        Matter.Body.setPosition(ball, {
+          x: ball.position.x + step,
+          y: ball.position.y,
+        });
+        Matter.Body.setVelocity(ball, {
+          x: 0,
+          y: Math.max(3, Math.min(7, ball.velocity.y || 4)),
+        });
       }
     }, 20);
 
