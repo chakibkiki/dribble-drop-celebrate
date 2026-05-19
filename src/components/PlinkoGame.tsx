@@ -326,7 +326,7 @@ export default function PlinkoGame({
         Matter.Body.setStatic(ball, true);
         clearInterval(settle);
         clearInterval(guide);
-        setTimeout(finish, 500);
+        setTimeout(finish, 120);
       }
     }, 80);
 
