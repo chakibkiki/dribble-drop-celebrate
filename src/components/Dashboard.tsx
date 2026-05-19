@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { QUOTAS, STORE_TYPE_LABEL, type StoreType, GIFTS } from "@/lib/quotaConfig";
 import { sessionStore } from "@/lib/sessionStore";
 import * as XLSX from "xlsx";
+import { Capacitor } from "@capacitor/core";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 
 type Session = { id: string; animator_name: string; wilaya: string; store_name: string; store_type: StoreType; started_at: string };
 
