@@ -182,6 +182,15 @@ export default function PlinkoGame({
     const slotTop = H - 110;
     const floorY = H - 30;
     const captureY = slotTop - 68;
+    const bottomPegY = H - 160;
+    const pegRadius = 7;
+    const clearPegsY = bottomPegY + ballRadius + pegRadius + 10;
+    const laneMargin = ballRadius + 8;
+    const laneLeft = targetSlot * slotW + laneMargin;
+    const laneRight = (targetSlot + 1) * slotW - laneMargin;
+    const laneBias = targetSlot <= 1 ? 22 : -22;
+    const safeApproachX = Math.max(laneLeft, Math.min(laneRight, targetX + laneBias));
+    const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
     let lockedToTarget = false;
     let lastMoveCheck = { x: ball.position.x, y: ball.position.y, stillTicks: 0 };
     let stuckCount = 0;
@@ -194,18 +203,25 @@ export default function PlinkoGame({
       const dx = targetX - ball.position.x;
       const y = ball.position.y;
       const speed = Math.hypot(ball.velocity.x, ball.velocity.y);
+      const guideX = y < clearPegsY ? safeApproachX : targetX;
+      const guideDx = guideX - ball.position.x;
 
-      // Anti-blocage : si le ballon reste posé sur un clou, on le relance doucement vers le bas.
+      // Anti-blocage : si le ballon reste posé sur un clou, on le décale vers un couloir sûr.
       const moved = Math.hypot(ball.position.x - lastMoveCheck.x, ball.position.y - lastMoveCheck.y);
       lastMoveCheck = {
         x: ball.position.x,
         y: ball.position.y,
-        stillTicks: moved < 0.8 && speed < 0.5 && y < captureY ? lastMoveCheck.stillTicks + 1 : 0,
+        stillTicks: moved < 0.9 && speed < 0.65 && y < clearPegsY ? lastMoveCheck.stillTicks + 1 : 0,
       };
-      if (lastMoveCheck.stillTicks >= 8) {
+      if (lastMoveCheck.stillTicks >= 5) {
+        const escapeDirection = Math.sign(guideDx) || (targetSlot <= 1 ? 1 : -1);
+        Matter.Body.setPosition(ball, {
+          x: clamp(ball.position.x + escapeDirection * 5, ballRadius + 6, W - ballRadius - 6),
+          y: ball.position.y + 1.5,
+        });
         Matter.Body.setVelocity(ball, {
-          x: Math.max(-2, Math.min(2, dx * 0.02 || (Math.random() - 0.5) * 1.8)),
-          y: 3.2,
+          x: clamp(guideDx * 0.08 || escapeDirection * 1.6, -3, 3),
+          y: 4.4,
         });
         lastMoveCheck.stillTicks = 0;
         stuckCount += 1;
@@ -218,23 +234,23 @@ export default function PlinkoGame({
         phase = "1·chute";
       } else if (y < captureY) {
         // Phase 2 : approche — on règle directement la vitesse horizontale
-        // pour amener le ballon dans la bonne colonne avant l'entrée du palier
-        const desiredVx = Math.max(-6, Math.min(6, dx * 0.08));
+        // vers un passage décalé pour éviter de rester posé sur les derniers clous.
+        const desiredVx = clamp(guideDx * 0.075, -5.2, 5.2);
         Matter.Body.setVelocity(ball, { x: desiredVx, y: ball.velocity.y });
         phase = "2·approche";
       } else {
         // Phase 3 : couloir final — le ballon est capturé dans sa colonne cible
         // avant les séparateurs, donc il ne peut plus sauter vers un autre palier.
         lockedToTarget = true;
-        const laneLeft = targetSlot * slotW + ballRadius + 6;
-        const laneRight = (targetSlot + 1) * slotW - ballRadius - 6;
-        const nextX = Math.max(laneLeft, Math.min(laneRight, ball.position.x + Math.sign(dx) * Math.min(Math.abs(dx), 4.5)));
+        const lockX = y < clearPegsY ? safeApproachX : targetX;
+        const lockDx = lockX - ball.position.x;
+        const nextX = clamp(ball.position.x + Math.sign(lockDx) * Math.min(Math.abs(lockDx), 4.5), laneLeft, laneRight);
         Matter.Body.setPosition(ball, {
           x: nextX,
           y: ball.position.y,
         });
         Matter.Body.setVelocity(ball, {
-          x: Math.max(-1.2, Math.min(1.2, dx * 0.02)),
+          x: clamp(lockDx * 0.02, -1.2, 1.2),
           y: Math.max(3.5, Math.min(6.5, ball.velocity.y || 4)),
         });
         phase = "3·lock";
