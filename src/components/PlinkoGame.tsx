@@ -155,7 +155,7 @@ export default function PlinkoGame({
     const slotW = W / 5;
     const targetX = slotW * targetSlot + slotW / 2;
 
-    const ballRadius = 16;
+    const ballRadius = 12;
     const ball = Matter.Bodies.circle(W / 2 + (Math.random() - 0.5) * 30, 30, ballRadius, {
       restitution: 0.35,
       friction: 0,
