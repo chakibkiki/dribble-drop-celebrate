@@ -37,15 +37,25 @@ export default function PlinkoGame({
     canvas.width = W;
     canvas.height = H;
 
+    // Détection mobile / appareils modestes pour adapter la charge physique & rendu
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.matchMedia?.("(pointer: coarse)").matches || window.innerWidth < 820);
+    const cores = (typeof navigator !== "undefined" && (navigator as Navigator & { hardwareConcurrency?: number }).hardwareConcurrency) || 4;
+    const lowEnd = isMobile && cores <= 4;
+
     const engine = Matter.Engine.create();
     // Gravité réduite pour une chute plus douce et lisible
     engine.gravity.y = 0.55;
-    // Plus d'itérations = collisions plus précises et rebonds plus fluides
-    engine.positionIterations = 10;
-    engine.velocityIterations = 10;
-    engine.constraintIterations = 4;
+    // Itérations adaptées : précision desktop, allégées sur mobile pour viser un 60 fps stable
+    engine.positionIterations = lowEnd ? 6 : isMobile ? 8 : 10;
+    engine.velocityIterations = lowEnd ? 6 : isMobile ? 8 : 10;
+    engine.constraintIterations = lowEnd ? 2 : isMobile ? 3 : 4;
     engineRef.current = engine;
 
+    // pixelRatio clampé pour éviter le sur-rendu sur les écrans Retina mobile
+    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+    const renderPixelRatio = isMobile ? Math.min(dpr, lowEnd ? 1 : 1.5) : Math.min(dpr, 2);
     const render = Matter.Render.create({
       canvas,
       engine,
@@ -54,7 +64,7 @@ export default function PlinkoGame({
         height: H,
         wireframes: false,
         background: "transparent",
-        pixelRatio: window.devicePixelRatio || 1,
+        pixelRatio: renderPixelRatio,
       },
     });
 
@@ -143,7 +153,15 @@ export default function PlinkoGame({
     }
 
     Matter.Render.run(render);
-    const runner = Matter.Runner.create();
+    // Runner à pas fixe : empêche l'accélération/saccade quand le FPS du device varie.
+    // delta = 1/60s côté desktop, 1/50s sur mobile bas de gamme pour rester fluide
+    // sans changer la vitesse perçue (le pas reste fixe pour la physique).
+    const physicsDelta = lowEnd ? 1000 / 50 : 1000 / 60;
+    const runner = Matter.Runner.create({
+      delta: physicsDelta,
+      // pas fixe : empêche que les chutes de FPS accélèrent la physique
+      isFixed: true,
+    } as Matter.IRunnerOptions & { isFixed: boolean });
     Matter.Runner.run(runner, engine);
 
     return () => {
@@ -411,40 +429,6 @@ export default function PlinkoGame({
           <span>déblocages: <b className={debug.stuck > 0 ? "text-red-400" : ""}>{debug.stuck}</b></span>
         </div>
       )}
-      <div className="mt-2 w-full max-w-md flex items-center justify-between gap-2">
-        <span className="text-white/80 text-[11px] font-mono">logs: {logCount} échantillons · essais: {runIdRef.current}</span>
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              const rows = logsRef.current;
-              if (!rows.length) return;
-              const header = ["run", "t_ms", "phase", "locked", "x", "y", "vx", "vy", "speed", "still_ticks", "stuck_count", "target"];
-              const csv = [header.join(",")].concat(
-                rows.map((r) => [r.run, r.t, r.phase, r.locked ? 1 : 0, r.x, r.y, r.vx, r.vy, r.speed, r.ticks, r.stuck, r.target].join(",")),
-              ).join("\n");
-              const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `plinko-debug-${new Date().toISOString().replace(/[:.]/g, "-")}.csv`;
-              a.click();
-              URL.revokeObjectURL(url);
-            }}
-            className="px-3 py-1 rounded bg-white text-[#e30613] text-[11px] font-bold uppercase"
-          >
-            Export CSV
-          </button>
-          <button
-            onClick={() => {
-              logsRef.current = [];
-              setLogCount(0);
-            }}
-            className="px-3 py-1 rounded bg-black/50 text-white text-[11px] font-bold uppercase border border-white/30"
-          >
-            Vider
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
