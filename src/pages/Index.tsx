@@ -62,20 +62,25 @@ const Index = () => {
 
   const onBallSettled = async () => {
     if (!sessionId || !participantId || !pendingPrize) return;
-    // Calcule numéro essai final
-    const { count } = await supabase.from("prize_distributions").select("*", { count: "exact", head: true }).eq("session_id", sessionId);
-    await supabase.from("prize_distributions").insert({
-      session_id: sessionId,
-      participant_id: participantId,
-      tier: pendingPrize.tier,
-      gift_key: pendingPrize.key,
-      gift_label: pendingPrize.label,
-      attempt_number: (count ?? 0) + 1,
-    });
-    setRevealed({ tier: pendingPrize.tier, label: pendingPrize.label, key: pendingPrize.key });
+    // Affiche immédiatement la révélation pour éviter la latence sur mobile
+    const prize = pendingPrize;
+    const pid = participantId;
+    setRevealed({ tier: prize.tier, label: prize.label, key: prize.key });
     setPendingPrize(null);
     setParticipantId(null);
     setStage("reveal");
+    // Persistance en arrière-plan
+    (async () => {
+      const { count } = await supabase.from("prize_distributions").select("*", { count: "exact", head: true }).eq("session_id", sessionId);
+      await supabase.from("prize_distributions").insert({
+        session_id: sessionId,
+        participant_id: pid,
+        tier: prize.tier,
+        gift_key: prize.key,
+        gift_label: prize.label,
+        attempt_number: (count ?? 0) + 1,
+      });
+    })();
   };
 
   if (stage === "loading") return <div className="min-h-screen flex items-center justify-center bg-background text-foreground">Chargement…</div>;
