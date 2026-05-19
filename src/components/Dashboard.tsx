@@ -27,58 +27,101 @@ export default function Dashboard({ sessionId, onPlay, onClosed }: { sessionId: 
 
   const closeDay = async () => {
     if (!session) return;
-    if (!confirm("Clôturer la journée et télécharger le fichier Excel ?")) return;
+    if (!confirm("Clôturer la journée et télécharger l'historique cumulatif ?")) return;
     setClosing(true);
 
     const { data: participants } = await supabase.from("participants").select("*").eq("session_id", sessionId).order("created_at");
     const { data: prizes } = await supabase.from("prize_distributions").select("*").eq("session_id", sessionId).order("attempt_number");
     const partMap = new Map((participants ?? []).map((p: any) => [p.id, p]));
 
+    // === Construction de l'entrée du jour ===
+    const dayKey = new Date(session.started_at).toISOString().slice(0, 10);
+    const cfg = QUOTAS[session.store_type];
+    const giftStats = Object.values(GIFTS).map((g) => {
+      const dist = (prizes ?? []).filter((p: any) => p.gift_key === g.key).length;
+      const init = cfg.stocks[g.key] ?? 0;
+      return { key: g.key, label: g.label, tier: g.tier, dist, init, rest: init - dist };
+    });
+    const dayEntry = {
+      date: dayKey,
+      started_at: session.started_at,
+      closed_at: new Date().toISOString(),
+      animator: session.animator_name,
+      wilaya: session.wilaya,
+      store_name: session.store_name,
+      store_type: session.store_type,
+      total: (prizes ?? []).length,
+      giftStats,
+      prizes: (prizes ?? []).map((p: any) => {
+        const part: any = partMap.get(p.participant_id);
+        return {
+          attempt: p.attempt_number,
+          time: p.created_at,
+          client: part?.full_name ?? "",
+          age: part?.age ?? "",
+          phone: part?.phone ?? "",
+          tier: p.tier,
+          gift: p.gift_label,
+        };
+      }),
+      participants: (participants ?? []).map((p: any) => ({
+        time: p.created_at, name: p.full_name, age: p.age, phone: p.phone ?? "",
+      })),
+    };
+
+    // === Historique cumulatif en localStorage ===
+    const histKey = `plinko_history_${session.store_name.replace(/[^a-z0-9]/gi, "_")}`;
+    const raw = localStorage.getItem(histKey);
+    const history: typeof dayEntry[] = raw ? JSON.parse(raw) : [];
+    // Remplace l'éventuelle entrée du même jour, sinon ajoute
+    const idx = history.findIndex((h) => h.date === dayKey);
+    if (idx >= 0) history[idx] = dayEntry; else history.push(dayEntry);
+    history.sort((a, b) => a.date.localeCompare(b.date));
+    localStorage.setItem(histKey, JSON.stringify(history));
+
+    // === Génération du fichier Excel cumulatif ===
     const wb = XLSX.utils.book_new();
 
-    // Onglet 1 : Résumé
-    const summary = [
-      ["Animateur", session.animator_name],
-      ["Wilaya", session.wilaya],
-      ["Magasin", session.store_name],
-      ["Type magasin", STORE_TYPE_LABEL[session.store_type]],
-      ["Date démarrage", new Date(session.started_at).toLocaleString("fr-FR")],
-      ["Date clôture", new Date().toLocaleString("fr-FR")],
-      ["Total cadeaux distribués", (prizes ?? []).length],
-      [],
-      ["Cadeau", "Distribués", "Quota initial", "Restant"],
-      ...Object.values(GIFTS).map((g) => {
-        const dist = (prizes ?? []).filter((p: any) => p.gift_key === g.key).length;
-        const init = QUOTAS[session.store_type].stocks[g.key] ?? 0;
-        return [g.label, dist, init, init - dist];
-      }),
-    ];
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), "Résumé");
-
-    // Onglet 2 : Cadeaux + clients
-    const rows = (prizes ?? []).map((p: any) => {
-      const part: any = partMap.get(p.participant_id);
-      return {
-        "N° essai": p.attempt_number,
-        "Heure": new Date(p.created_at).toLocaleString("fr-FR"),
-        "Client": part?.full_name ?? "",
-        "Âge": part?.age ?? "",
-        "Téléphone": part?.phone ?? "",
-        "Palier": p.tier,
-        "Cadeau": p.gift_label,
-      };
+    // Onglet "Résumé global" : une ligne par jour + totaux par cadeau
+    const giftKeys = Object.values(GIFTS);
+    const globalHeader = ["Date", "Magasin", "Animateur", "Total distribués", ...giftKeys.map((g) => g.label)];
+    const globalRows: any[][] = [globalHeader];
+    history.forEach((h) => {
+      globalRows.push([
+        h.date, h.store_name, h.animator, h.total,
+        ...giftKeys.map((g) => h.giftStats.find((s) => s.key === g.key)?.dist ?? 0),
+      ]);
     });
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Cadeaux distribués");
+    // Totaux
+    globalRows.push([]);
+    globalRows.push([
+      "TOTAL", "", "", history.reduce((s, h) => s + h.total, 0),
+      ...giftKeys.map((g) => history.reduce((s, h) => s + (h.giftStats.find((x) => x.key === g.key)?.dist ?? 0), 0)),
+    ]);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(globalRows), "Résumé global");
 
-    // Onglet 3 : Tous participants
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet((participants ?? []).map((p: any) => ({
-      "Heure": new Date(p.created_at).toLocaleString("fr-FR"),
-      "Nom": p.full_name,
-      "Âge": p.age,
-      "Téléphone": p.phone ?? "",
-    }))), "Participants");
+    // Un onglet par journée
+    history.forEach((h) => {
+      const sheet: any[][] = [
+        ["Animateur", h.animator],
+        ["Wilaya", h.wilaya],
+        ["Magasin", h.store_name],
+        ["Type magasin", STORE_TYPE_LABEL[h.store_type as StoreType]],
+        ["Démarrage", new Date(h.started_at).toLocaleString("fr-FR")],
+        ["Clôture", new Date(h.closed_at).toLocaleString("fr-FR")],
+        ["Total cadeaux distribués", h.total],
+        [],
+        ["Cadeau", "Distribués", "Quota initial", "Restant"],
+        ...h.giftStats.map((s) => [s.label, s.dist, s.init, s.rest]),
+        [],
+        ["N° essai", "Heure", "Client", "Âge", "Téléphone", "Palier", "Cadeau"],
+        ...h.prizes.map((p) => [p.attempt, new Date(p.time).toLocaleString("fr-FR"), p.client, p.age, p.phone, p.tier, p.gift]),
+      ];
+      const safeName = h.date.replace(/[^0-9-]/g, "").slice(0, 31) || "Journée";
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sheet), safeName);
+    });
 
-    const fname = `Plinko_${session.store_name.replace(/[^a-z0-9]/gi, "_")}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    const fname = `Historique_Stocks_${session.store_name.replace(/[^a-z0-9]/gi, "_")}.xlsx`;
     XLSX.writeFile(wb, fname);
 
     await supabase.from("animator_sessions").update({ closed_at: new Date().toISOString() }).eq("id", sessionId);
