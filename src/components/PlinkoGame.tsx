@@ -275,31 +275,7 @@ export default function PlinkoGame({
         });
         phase = "3·lock";
       }
-      setDebug({
-        speed: Math.round(speed * 100) / 100,
-        vx: Math.round(ball.velocity.x * 100) / 100,
-        vy: Math.round(ball.velocity.y * 100) / 100,
-        y: Math.round(y),
-        ticks: lastMoveCheck.stillTicks,
-        stuck: stuckCount,
-        phase,
-        locked: lockedToTarget,
-      });
-      logsRef.current.push({
-        run: runId,
-        t: Math.round(performance.now() - runStartRef.current),
-        phase,
-        locked: lockedToTarget,
-        x: Math.round(ball.position.x * 10) / 10,
-        y: Math.round(y * 10) / 10,
-        vx: Math.round(ball.velocity.x * 100) / 100,
-        vy: Math.round(ball.velocity.y * 100) / 100,
-        speed: Math.round(speed * 100) / 100,
-        ticks: lastMoveCheck.stillTicks,
-        stuck: stuckCount,
-        target: targetSlot,
-      });
-      setLogCount(logsRef.current.length);
+      // Logs/debug désactivés pour éviter des re-renders pendant le jeu (perfs Android)
     }, 20);
 
     let finished = false;
@@ -326,9 +302,9 @@ export default function PlinkoGame({
         Matter.Body.setStatic(ball, true);
         clearInterval(settle);
         clearInterval(guide);
-        setTimeout(finish, 120);
+        finish();
       }
-    }, 80);
+    }, 30);
 
     const safety = setTimeout(finish, 12000);
   };
