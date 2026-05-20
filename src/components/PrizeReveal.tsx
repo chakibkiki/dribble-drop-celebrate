@@ -48,7 +48,7 @@ export default function PrizeReveal({ tier, giftKey, giftLabel, onContinue }: { 
           <img
             src={gift?.image}
             alt={giftLabel}
-            className="relative max-h-[24vh] md:max-h-[28vh] w-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.45)]"
+            className="relative max-h-[18vh] lg:max-h-[22vh] w-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.45)]"
           />
         </div>
       </div>
