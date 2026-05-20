@@ -22,6 +22,32 @@ export default function PlinkoGame({
   const engineRef = useRef<Matter.Engine | null>(null);
   const [dropped, setDropped] = useState(false);
   const [done, setDone] = useState(false);
+  const [boardScale, setBoardScale] = useState(1);
+
+  // Dimensions logiques du plateau (physique Matter inchangée)
+  const BOARD_W = 420;
+  const BOARD_H = 720;
+
+  useEffect(() => {
+    const compute = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      // Place réservée : ~80px header + ~120px bouton/marges
+      const availW = vw - 24;
+      const availH = vh - 200;
+      const s = Math.min(availW / BOARD_W, availH / BOARD_H);
+      // On laisse grandir jusqu'à ~1.8x pour les tablettes 10"
+      setBoardScale(Math.max(0.6, Math.min(s, 2)));
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    window.addEventListener("orientationchange", compute);
+    return () => {
+      window.removeEventListener("resize", compute);
+      window.removeEventListener("orientationchange", compute);
+    };
+  }, []);
+
   const [debug, setDebug] = useState({ speed: 0, vx: 0, vy: 0, y: 0, ticks: 0, stuck: 0, phase: "—", locked: false });
   const logsRef = useRef<Array<{ run: number; t: number; phase: string; locked: boolean; x: number; y: number; vx: number; vy: number; speed: number; ticks: number; stuck: number; target: number }>>([]);
   const runIdRef = useRef(0);
@@ -311,7 +337,7 @@ export default function PlinkoGame({
 
   return (
     <div className="min-h-screen bg-[#e30613] flex flex-col items-center p-3 overflow-hidden">
-      <div className="w-full max-w-md flex justify-between items-center mb-2">
+      <div className="w-full max-w-3xl flex justify-between items-center mb-2">
         <button onClick={onBack} className="text-white/80 text-sm">
           ← Retour
         </button>
@@ -319,11 +345,19 @@ export default function PlinkoGame({
       </div>
 
       <div
+        style={{
+          width: BOARD_W * boardScale,
+          height: BOARD_H * boardScale,
+        }}
+      >
+      <div
         className="relative rounded-xl border-4 border-primary-foreground/20 overflow-hidden"
         style={{
-          width: 420,
-          maxWidth: "100%",
+          width: BOARD_W,
+          height: BOARD_H,
           backgroundColor: "#4f8a36",
+          transform: `scale(${boardScale})`,
+          transformOrigin: "top left",
         }}
       >
         {/* Lignes terrain */}
@@ -382,6 +416,7 @@ export default function PlinkoGame({
             );
           })}
         </div>
+      </div>
       </div>
 
       {!dropped && (
