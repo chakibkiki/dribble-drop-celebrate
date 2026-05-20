@@ -38,7 +38,7 @@ export default function PrizeReveal({ tier, giftKey, giftLabel, onContinue }: { 
 
   return (
     <div
-      className="min-h-screen w-full bg-contain bg-top bg-no-repeat flex flex-col items-center bg-[#0a2a6e]"
+      className="min-h-screen w-full bg-cover bg-top bg-no-repeat flex flex-col items-center bg-[#0a2a6e]"
       style={{ backgroundImage: `url(${bg})` }}
     >
       {/* Cadeau gagné, positionné dans la zone haute du visuel */}
@@ -48,7 +48,7 @@ export default function PrizeReveal({ tier, giftKey, giftLabel, onContinue }: { 
           <img
             src={gift?.image}
             alt={giftLabel}
-            className="relative max-h-[18vh] w-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.45)]"
+            className="relative max-h-[24vh] md:max-h-[28vh] w-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.45)]"
           />
         </div>
       </div>
@@ -57,7 +57,7 @@ export default function PrizeReveal({ tier, giftKey, giftLabel, onContinue }: { 
 
       <button
         onClick={onContinue}
-        className="mb-8 px-12 py-4 rounded-full bg-gradient-gold text-accent-foreground text-lg font-extrabold uppercase tracking-wider glow-gold active:scale-95 transition-transform border-2 border-white shadow-[0_4px_0_rgba(0,0,0,0.25)]"
+        className="mb-8 px-12 py-4 md:px-16 md:py-5 rounded-full bg-gradient-gold text-accent-foreground text-lg md:text-2xl font-extrabold uppercase tracking-wider glow-gold active:scale-95 transition-transform border-2 border-white shadow-[0_4px_0_rgba(0,0,0,0.25)]"
       >
         Continuer
       </button>
